@@ -51,6 +51,8 @@
             sslObjID = new ToolStripStatusLabel();
             sslPerformer = new ToolStripStatusLabel();
             sslRuntime = new ToolStripStatusLabel();
+            ssGap = new ToolStripStatusLabel();
+            ssProgress = new ToolStripProgressBar();
             folderLogBrowserDialog = new FolderBrowserDialog();
             mMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -154,6 +156,7 @@
             // 
             lstLines.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lstLines.Columns.AddRange(new ColumnHeader[] { chDateTime, chData });
+            lstLines.ContextMenuStrip = mLstContext;
             lstLines.FullRowSelect = true;
             lstLines.Location = new Point(0, 32);
             lstLines.Name = "lstLines";
@@ -176,18 +179,19 @@
             // 
             mLstContext.Items.AddRange(new ToolStripItem[] { addToFiltersToolStripMenuItem });
             mLstContext.Name = "mLstContext";
-            mLstContext.Size = new Size(145, 26);
+            mLstContext.Size = new Size(181, 48);
+            mLstContext.Opening += mLstContext_Opening;
             // 
             // addToFiltersToolStripMenuItem
             // 
             addToFiltersToolStripMenuItem.Name = "addToFiltersToolStripMenuItem";
-            addToFiltersToolStripMenuItem.Size = new Size(144, 22);
+            addToFiltersToolStripMenuItem.Size = new Size(180, 22);
             addToFiltersToolStripMenuItem.Text = "Add to Filters";
             addToFiltersToolStripMenuItem.Click += addToFiltersToolStripMenuItem_Click;
             // 
             // ssData
             // 
-            ssData.Items.AddRange(new ToolStripItem[] { sslNodeID, sslFunc, sslAction, sslObjID, sslPerformer, sslRuntime });
+            ssData.Items.AddRange(new ToolStripItem[] { sslNodeID, sslFunc, sslAction, sslObjID, sslPerformer, sslRuntime, ssGap, ssProgress });
             ssData.Location = new Point(0, 586);
             ssData.Name = "ssData";
             ssData.Size = new Size(1129, 22);
@@ -224,6 +228,18 @@
             sslRuntime.Name = "sslRuntime";
             sslRuntime.Size = new Size(13, 17);
             sslRuntime.Text = "0";
+            // 
+            // ssGap
+            // 
+            ssGap.Name = "ssGap";
+            ssGap.Size = new Size(1101, 17);
+            ssGap.Spring = true;
+            // 
+            // ssProgress
+            // 
+            ssProgress.Name = "ssProgress";
+            ssProgress.Size = new Size(100, 16);
+            ssProgress.Visible = false;
             // 
             // folderLogBrowserDialog
             // 
@@ -277,5 +293,7 @@
         private FolderBrowserDialog folderLogBrowserDialog;
         private ContextMenuStrip mLstContext;
         private ToolStripMenuItem addToFiltersToolStripMenuItem;
+        private ToolStripProgressBar ssProgress;
+        private ToolStripStatusLabel ssGap;
     }
 }

@@ -9,8 +9,6 @@ namespace OT_Performance_Tracer
 {
     internal class LogFilters
     {
-        public static string[] Excludes = [];
-
         private const string rootKey = "Software\\OTPerfTrace";
         private const string filtersKey = "Filters";
 
@@ -46,6 +44,18 @@ namespace OT_Performance_Tracer
             {
                 lSubKey.SetValue(i.ToString(), filters[i]);
             };
+        }
+
+        public static void addFilter(string singleFilter)
+        {
+            //load the filters
+            string[] filters = getRegistrySettings();
+
+            //append
+            filters = [.. filters, singleFilter];
+
+            //save
+            setRegistrySettings(filters);
         }
     }
 }
