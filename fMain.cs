@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Reflection.Emit;
 using System.Windows.Forms;
@@ -34,6 +35,9 @@ namespace OT_Performance_Tracer
                 TreeNode singlePart = new();
                 singlePart.Text = $"{ThreadBlocks.BlockNames[block.Value.BlockType]} [{diff}]";
                 singlePart.Name = $"{FileName}_{block.Key}";
+                //set text color red if more than 10 seconds
+                if (diff.TotalSeconds> 10) singlePart.ForeColor = Color.Red;
+
                 parts = [.. parts, singlePart];
 
                 tempBlocks.Add($"{FileName}_{block.Key}", block.Value);
@@ -55,7 +59,17 @@ namespace OT_Performance_Tracer
             //open thread log dialog
             if (openThreadLogDialog.ShowDialog() != DialogResult.OK) return;
 
-            //LoadSingleFile(openThreadLogDialog.FileName);
+            var progress = new Progress<(string, TreeNode[])>(value =>
+            {
+                //update tree node
+                UpdateTreeNode(value.Item1, value.Item2);
+            });
+            string FileName = Path.GetFileNameWithoutExtension(openThreadLogDialog.FileName);
+
+            //create node
+            TreeNode fileNode = tvBlocks.Nodes.Add(FileName, FileName);
+
+            _ = Task.Factory.StartNew(() => LoadSingleFile(openThreadLogDialog.FileName, fileNode!, progress), TaskCreationOptions.LongRunning);
         }
 
         private void tvBlocks_AfterSelect(object sender, TreeViewEventArgs e)
@@ -89,6 +103,7 @@ namespace OT_Performance_Tracer
             lstLines.SuspendLayout(); //many writes, so don't update with every add
             lstLines.Items.Clear();
 
+            DateTime diffFromPrevious = singleBlock.Parts![0].timeStamp;
             foreach ((DateTime timeStamp, string message) part in singleBlock.Parts!)
             {
                 //see if excluded
@@ -96,6 +111,10 @@ namespace OT_Performance_Tracer
 
                 ListViewItem singleLine = new(part.timeStamp.ToString());
                 singleLine.SubItems.Add(part.message);
+
+                //mark red if more than 10 seconds have passed
+                if ((part.timeStamp - diffFromPrevious).TotalSeconds > 10 ) singleLine.ForeColor = Color.Red;
+                diffFromPrevious = part.timeStamp;
                 lstLines.Items.Add(singleLine);
             }
 
@@ -155,7 +174,7 @@ namespace OT_Performance_Tracer
             tvBlocks.ResumeLayout();
             tvBlocks.PerformLayout();
 
-            Thread.Sleep(100);
+            Thread.Sleep(1000); //allow form to catch up
 
             foreach (string file in files)
             {
