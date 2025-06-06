@@ -26,8 +26,24 @@ namespace OT_Performance_Tracer
             //open the log file
             _data = File.ReadAllLines(_filename);
 
-            //line one should start with thread starup
-            if (_data[0].Contains("OScript thread startup begin") == false) return false;
+            //look for thread startup in first few lines. if log level is debug, will not be first            
+            bool found = false;
+            for (int indexer=0; indexer<100; indexer++)
+            {
+                if (_data.Length >  indexer)
+                {
+                    if (_data[indexer].Contains("OScript thread startup begin"))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (found == false) return false;
+
+            //this fails if thread logs are highter than info, need to read a few lines
+            //if (_data[0].Contains("OScript thread startup begin") == false) return false;
 
             return true;
         }
@@ -50,7 +66,7 @@ namespace OT_Performance_Tracer
             //go each line at a time and find different blocks
             if (_data is null) return; //shoudl throw an exeption instead
 
-            ThreadBlocks? currentBlock = null;
+            ThreadBlocks? currentBlock = new(BlockTypes.Unkown);
             DateTime previousDT = DateTime.MinValue;
             int blockCount = 0;
             string blockName = Path.GetFileNameWithoutExtension(_filename);
@@ -126,6 +142,12 @@ namespace OT_Performance_Tracer
             if (currentBlock != null)
             {
                 _blocks.Add(blockCount, currentBlock);
+            }
+
+            //first block is 'unkown', but could be empty. if empty, delete
+            if (_blocks[0].Parts!.Count == 0)
+            {
+                _blocks.Remove(0);
             }
             
         }
