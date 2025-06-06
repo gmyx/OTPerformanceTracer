@@ -149,7 +149,15 @@ namespace OT_Performance_Tracer
             {
                 _blocks.Remove(0);
             }
-            
+
+            //last line of file could be a late log, causing issue... delete it
+            if (_blocks.Last().Value.Parts!.Last().message.Contains("FilePrefs::GetKFilePrefs - sharing loaded pref"))
+            {
+                //this is the one we want to surpress
+                _blocks.Last().Value.Parts!.Remove(_blocks.Last().Value.Parts!.Last());
+            }
+
+
         }
 
         public Dictionary<int, ThreadBlocks> Blocks { get { return _blocks; } }

@@ -14,7 +14,7 @@ namespace OT_Performance_Tracer
 
         private Dictionary<string, ThreadBlocks> Blocks = [];
 
-        private void LoadSingleFile(string path, TreeNode rootNode, IProgress<(string, TreeNode[])> progress)
+        private void LoadSingleFile(string path, TreeNode rootNode, IProgress<(string, TreeNode[], int)> progress)
         {
             ThreadLogAnalyser lThread = new ThreadLogAnalyser(path);
             if (lThread.LoadFile()) lThread.AnalyseFile();
@@ -26,6 +26,7 @@ namespace OT_Performance_Tracer
 
             //now show each block in the tree
             Dictionary<string, ThreadBlocks> tempBlocks = [];
+            int redCount = 0;
             foreach (KeyValuePair<int, ThreadBlocks> block in singleThreadBlocks)
             {
                 DateTime startTime = block.Value.Parts!.First().timeStamp;
@@ -35,8 +36,12 @@ namespace OT_Performance_Tracer
                 TreeNode singlePart = new();
                 singlePart.Text = $"{ThreadBlocks.BlockNames[block.Value.BlockType]} [{diff}]";
                 singlePart.Name = $"{FileName}_{block.Key}";
-                //set text color red if more than 10 seconds
-                if (diff.TotalSeconds> 10) singlePart.ForeColor = Color.Red;
+                //set text color red if more than 10 seconds, unless startup, since that is very long
+                if (diff.TotalSeconds > 10 && block.Value.BlockType != ThreadBlocks.BlockTypes.Startup)
+                {
+                    singlePart.ForeColor = Color.Red;
+                    redCount++;
+                }
 
                 parts = [.. parts, singlePart];
 
@@ -51,7 +56,7 @@ namespace OT_Performance_Tracer
                 }
             }
 
-            progress.Report((FileName, parts));
+            progress.Report((FileName, parts, redCount));
         }
 
         private void loadThreadLogToolStripMenuItem_Click(object sender, EventArgs e)
@@ -59,10 +64,10 @@ namespace OT_Performance_Tracer
             //open thread log dialog
             if (openThreadLogDialog.ShowDialog() != DialogResult.OK) return;
 
-            var progress = new Progress<(string, TreeNode[])>(value =>
+            var progress = new Progress<(string, TreeNode[], int)>(value =>
             {
                 //update tree node
-                UpdateTreeNode(value.Item1, value.Item2);
+                UpdateTreeNode(value.Item1, value.Item2, value.Item3);
             });
             string FileName = Path.GetFileNameWithoutExtension(openThreadLogDialog.FileName);
 
@@ -123,13 +128,16 @@ namespace OT_Performance_Tracer
             lstLines.ResumeLayout();
         }
 
-        private void UpdateTreeNode(string nodeName, TreeNode[] subNodes)
+        private void UpdateTreeNode(string nodeName, TreeNode[] subNodes, int redCount)
         {
             //get the right parent
             TreeNode? root = tvBlocks.Nodes[nodeName];
 
             if (root == null) return;
             root.Nodes.AddRange(subNodes);
+
+            //update node text
+            root.Text = root.Text + $"[{redCount}]";
         }
 
         private void loadFolderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -151,14 +159,14 @@ namespace OT_Performance_Tracer
             int max = files.Length;
             int current = 0;
 
-            var progress = new Progress<(string, TreeNode[])>(value =>
+            var progress = new Progress<(string, TreeNode[], int)>(value =>
             {
                 current++;
                 float per = ((float)current / (float)max) * 100;
                 ssProgress.Value = (int)Math.Floor(per);
 
                 //update the tree node
-                UpdateTreeNode(value.Item1, value.Item2);
+                UpdateTreeNode(value.Item1, value.Item2, value.Item3);
 
                 if (current >= max) ssProgress.Visible = false;
             });
