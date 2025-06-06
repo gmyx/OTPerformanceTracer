@@ -5,6 +5,7 @@
 * load a folder
 * highlight long running requets (currenlty fixed at 10+ seconds)
 * rudementry exclude filter, basicly a * something * search. stored in HKCU\OTPerftrace\Filters
+* all files are loaded async using tasks
 
 ## potential features
 * configuration options (change highlight color, time required, fonts, etc)

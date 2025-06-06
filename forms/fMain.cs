@@ -1,3 +1,4 @@
+using OT_Performance_Tracer.classes;
 using System;
 using System.IO;
 using System.Reflection.Emit;
@@ -104,6 +105,9 @@ namespace OT_Performance_Tracer
             var diff = endTime - startTime;
             sslRuntime.Text = diff.ToString();
 
+            //if there are stats, enable button
+            cStats.Enabled = (singleBlock.stats != null);
+
             //load the list
             lstLines.SuspendLayout(); //many writes, so don't update with every add
             lstLines.Items.Clear();
@@ -118,7 +122,7 @@ namespace OT_Performance_Tracer
                 singleLine.SubItems.Add(part.message);
 
                 //mark red if more than 10 seconds have passed
-                if ((part.timeStamp - diffFromPrevious).TotalSeconds > 10 ) singleLine.ForeColor = Color.Red;
+                if ((part.timeStamp - diffFromPrevious).TotalSeconds > 10) singleLine.ForeColor = Color.Red;
                 diffFromPrevious = part.timeStamp;
                 lstLines.Items.Add(singleLine);
             }
@@ -202,7 +206,7 @@ namespace OT_Performance_Tracer
         private void addToFiltersToolStripMenuItem_Click(object sender, EventArgs e)
         {
             fAddEditFilter form = new();
-            if(form.Add(lstLines.SelectedItems[0].SubItems[1].Text) == DialogResult.Cancel) return;
+            if (form.Add(lstLines.SelectedItems[0].SubItems[1].Text) == DialogResult.Cancel) return;
 
             //add the filter and save
             LogFilters.addFilter(form.FilterValue);
@@ -212,7 +216,36 @@ namespace OT_Performance_Tracer
 
         private void mLstContext_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            addToFiltersToolStripMenuItem.Enabled = (lstLines.SelectedItems.Count==0 ? false : true);
+            addToFiltersToolStripMenuItem.Enabled = (lstLines.SelectedItems.Count == 0 ? false : true);
+        }
+
+        private void openInWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (lstLines.SelectedItems.Count == 0) return;
+
+            fShowDetails form = new();
+
+            form.ShowDetails(lstLines.SelectedItems[0].SubItems[1].Text);
+        }
+
+        private void btnStats_Click(object sender, EventArgs e)
+        {
+            if (tvBlocks.SelectedNode == null) return;
+
+            string blockName = tvBlocks.SelectedNode!.Name;
+
+            //see if file or block, if file abort
+            if (blockName.Contains("_") == false) return;
+
+            //get the block
+            int blockIndex = int.Parse(blockName.Split("_")[1]);
+            ThreadBlocks? singleBlock;
+            if (Blocks.TryGetValue(blockName, out singleBlock) == false) return; //something went wrong
+
+            fShowDetails form = new();
+            form.ShowDetails(singleBlock.stats!);
+
+            
         }
     }
 }

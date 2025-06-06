@@ -1,12 +1,11 @@
-﻿using OT_Performance_Tracer;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static OT_Performance_Tracer.ThreadBlocks;
+using static OT_Performance_Tracer.classes.ThreadBlocks;
 
-namespace OT_Performance_Tracer
+namespace OT_Performance_Tracer.classes
 {
     internal class ThreadLogAnalyser
     {
@@ -73,7 +72,7 @@ namespace OT_Performance_Tracer
 
             foreach (string line in _data)
             {
-                foreach (KeyValuePair<BlockTypes, string> StartID in ThreadBlocks.StartIDs)
+                foreach (KeyValuePair<BlockTypes, string> StartID in StartIDs)
                 {
                     if (StartID.Value != "" && line.Contains(StartID.Value))
                     {
@@ -132,10 +131,14 @@ namespace OT_Performance_Tracer
                 else if (line.Contains("objAction = "))
                 {
                     currentBlock!.Action = line.Split(" = ")[1];
+                } else if(line.Contains("A<1,0,'__ExecutionHandler'"))
+                {
+                    //this is the stats block
+                    currentBlock!.stats = line;
                 }
 
-                //add this line
-                currentBlock!.Parts!.Add(value);                
+                    //add this line
+                    currentBlock!.Parts!.Add(value);                
             }
 
             //clean up any remaining data

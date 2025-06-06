@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OT_Performance_Tracer
+namespace OT_Performance_Tracer.classes
 {
     internal class ThreadBlocks
     {
@@ -26,10 +26,11 @@ namespace OT_Performance_Tracer
         }
 
         public List<(DateTime timeStamp, string message)>? Parts = [];
-        public string Func;
-        public string Action;
-        public string objID;
-        public string Performer;
+        public string? Func;
+        public string? Action;
+        public string? objID;
+        public string? Performer;
+        public string? stats;
         public BlockTypes BlockType { get { return _type; } }
 
         public readonly static Dictionary<BlockTypes, string> BlockNames = new Dictionary<BlockTypes, string> {

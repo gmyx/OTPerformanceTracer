@@ -38,12 +38,13 @@
             openThreadLogDialog = new OpenFileDialog();
             splitContainer1 = new SplitContainer();
             tvBlocks = new TreeView();
-            btnStats = new Button();
+            cStats = new Button();
             lstLines = new ListView();
             chDateTime = new ColumnHeader();
             chData = new ColumnHeader();
             mLstContext = new ContextMenuStrip(components);
             addToFiltersToolStripMenuItem = new ToolStripMenuItem();
+            openInWindowToolStripMenuItem = new ToolStripMenuItem();
             ssData = new StatusStrip();
             sslNodeID = new ToolStripStatusLabel();
             sslFunc = new ToolStripStatusLabel();
@@ -126,7 +127,7 @@
             // 
             // splitContainer1.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(btnStats);
+            splitContainer1.Panel2.Controls.Add(cStats);
             splitContainer1.Panel2.Controls.Add(lstLines);
             splitContainer1.Size = new Size(1129, 584);
             splitContainer1.SplitterDistance = 376;
@@ -142,15 +143,16 @@
             tvBlocks.TabIndex = 1;
             tvBlocks.AfterSelect += tvBlocks_AfterSelect;
             // 
-            // btnStats
+            // cStats
             // 
-            btnStats.Enabled = false;
-            btnStats.Location = new Point(687, 2);
-            btnStats.Name = "btnStats";
-            btnStats.Size = new Size(50, 23);
-            btnStats.TabIndex = 5;
-            btnStats.Text = "Stats";
-            btnStats.UseVisualStyleBackColor = true;
+            cStats.Enabled = false;
+            cStats.Location = new Point(687, 2);
+            cStats.Name = "cStats";
+            cStats.Size = new Size(50, 23);
+            cStats.TabIndex = 5;
+            cStats.Text = "Stats";
+            cStats.UseVisualStyleBackColor = true;
+            cStats.Click += btnStats_Click;
             // 
             // lstLines
             // 
@@ -160,7 +162,7 @@
             lstLines.FullRowSelect = true;
             lstLines.Location = new Point(0, 32);
             lstLines.Name = "lstLines";
-            lstLines.Size = new Size(749, 552);
+            lstLines.Size = new Size(749, 527);
             lstLines.TabIndex = 0;
             lstLines.UseCompatibleStateImageBehavior = false;
             lstLines.View = View.Details;
@@ -177,17 +179,24 @@
             // 
             // mLstContext
             // 
-            mLstContext.Items.AddRange(new ToolStripItem[] { addToFiltersToolStripMenuItem });
+            mLstContext.Items.AddRange(new ToolStripItem[] { addToFiltersToolStripMenuItem, openInWindowToolStripMenuItem });
             mLstContext.Name = "mLstContext";
-            mLstContext.Size = new Size(181, 48);
+            mLstContext.Size = new Size(164, 48);
             mLstContext.Opening += mLstContext_Opening;
             // 
             // addToFiltersToolStripMenuItem
             // 
             addToFiltersToolStripMenuItem.Name = "addToFiltersToolStripMenuItem";
-            addToFiltersToolStripMenuItem.Size = new Size(180, 22);
+            addToFiltersToolStripMenuItem.Size = new Size(163, 22);
             addToFiltersToolStripMenuItem.Text = "Add to Filters";
             addToFiltersToolStripMenuItem.Click += addToFiltersToolStripMenuItem_Click;
+            // 
+            // openInWindowToolStripMenuItem
+            // 
+            openInWindowToolStripMenuItem.Name = "openInWindowToolStripMenuItem";
+            openInWindowToolStripMenuItem.Size = new Size(163, 22);
+            openInWindowToolStripMenuItem.Text = "Open in Window";
+            openInWindowToolStripMenuItem.Click += openInWindowToolStripMenuItem_Click;
             // 
             // ssData
             // 
@@ -279,7 +288,7 @@
         private TreeView tvBlocks;
         private ColumnHeader chDateTime;
         private ColumnHeader chData;
-        private Button btnStats;
+        private Button cStats;
         private StatusStrip ssData;
         private ToolStripStatusLabel sslNodeID;
         private ToolStripStatusLabel sslFunc;
@@ -295,5 +304,6 @@
         private ToolStripMenuItem addToFiltersToolStripMenuItem;
         private ToolStripProgressBar ssProgress;
         private ToolStripStatusLabel ssGap;
+        private ToolStripMenuItem openInWindowToolStripMenuItem;
     }
 }

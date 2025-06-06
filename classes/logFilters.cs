@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OT_Performance_Tracer
+namespace OT_Performance_Tracer.classes
 {
     internal class LogFilters
     {
@@ -24,7 +24,7 @@ namespace OT_Performance_Tracer
             if (lSubKey == null) return [];
 
             //both keys exists, so read it
-            String[] lOut = [];
+            string[] lOut = [];
             lSubKey.GetValueNames().ToList().ForEach(name =>
             {
                 lOut = [.. lOut, lSubKey.GetValue(name)!.ToString()!];
