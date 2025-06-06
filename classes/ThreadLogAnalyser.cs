@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static OT_Performance_Tracer.classes.ThreadBlocks;
+﻿using static OT_Performance_Tracer.classes.ThreadBlocks;
 
 namespace OT_Performance_Tracer.classes
 {
     internal class ThreadLogAnalyser
     {
-
         private readonly string _filename;
         private string[]? _data = [];
         private Dictionary<int, ThreadBlocks> _blocks;
-        public ThreadLogAnalyser(string filename) {
+
+        public ThreadLogAnalyser(string filename)
+        {
             _filename = filename;
             _blocks = [];
 
@@ -25,11 +21,11 @@ namespace OT_Performance_Tracer.classes
             //open the log file
             _data = File.ReadAllLines(_filename);
 
-            //look for thread startup in first few lines. if log level is debug, will not be first            
+            //look for thread startup in first few lines. if log level is debug, will not be first
             bool found = false;
-            for (int indexer=0; indexer<100; indexer++)
+            for (int indexer = 0; indexer < 100; indexer++)
             {
-                if (_data.Length >  indexer)
+                if (_data.Length > indexer)
                 {
                     if (_data[indexer].Contains("OScript thread startup begin"))
                     {
@@ -52,7 +48,7 @@ namespace OT_Performance_Tracer.classes
             if (line.Length < 19) throw new Exception("Bad date format");
 
             //currently supported format:
-            //  MM/DD/YYYY HH:MM:SS            
+            //  MM/DD/YYYY HH:MM:SS
             string datePart = line[..19]; //sloppy
             DateTime dOut;
             if (DateTime.TryParse(datePart, out dOut) == false) throw new Exception("Bad date format");
@@ -84,20 +80,24 @@ namespace OT_Performance_Tracer.classes
                         }
 
                         //create a new block
-                        ThreadBlocks oldBlock = currentBlock!;
+                        //ThreadBlocks oldBlock = currentBlock!;
                         currentBlock = new ThreadBlocks(StartID.Key);
 
-                        //if block is a request block, one line from previous block belongs here
-                        if (StartID.Key == BlockTypes.Request)
+                        //if block is a request block, one line from previous block belongs here                        
+                        if (StartID.Key == BlockTypes.Request || StartID.Key == BlockTypes.LogLevelChange)
                         {
-                            (DateTime timeStamp, string message) lastLine = oldBlock.Parts!.Last();
-                            oldBlock.Parts!.Remove(lastLine);
+                            //depends on the previous line                            
+                            (DateTime timeStamp, string message) lastLine = _blocks[blockCount - 1].Parts!.Last();
+                            _blocks[blockCount - 1].Parts!.Remove(_blocks[blockCount - 1].Parts!.Last()); 
 
-                            //add it current block
-                            currentBlock.Parts!.Add(lastLine);
+                            if (lastLine.message.Contains("DEBUG KFilePrefs::GetKFilePrefs - sharing loaded pref:") == false)
+                            {                            
+                                //add it current block
+                                currentBlock.Parts!.Add(lastLine);
+                            } // else just drop it
                         }
                     }
-                }                
+                }
 
                 //add the line to the current block
                 (DateTime timeStamp, string message) value;
@@ -124,21 +124,23 @@ namespace OT_Performance_Tracer.classes
                 if (line.Contains("func = "))
                 {
                     currentBlock!.Func = line.Split(" = ")[1];
-                } else if (line.Contains("objId = "))
+                }
+                else if (line.Contains("objId = "))
                 {
                     currentBlock!.objID = line.Split(" = ")[1];
                 }
                 else if (line.Contains("objAction = "))
                 {
                     currentBlock!.Action = line.Split(" = ")[1];
-                } else if(line.Contains("A<1,0,'__ExecutionHandler'"))
+                }
+                else if (line.Contains("A<1,0,'__ExecutionHandler'"))
                 {
                     //this is the stats block
                     currentBlock!.stats = line;
                 }
 
-                    //add this line
-                    currentBlock!.Parts!.Add(value);                
+                //add this line
+                currentBlock!.Parts!.Add(value);
             }
 
             //clean up any remaining data
@@ -159,10 +161,9 @@ namespace OT_Performance_Tracer.classes
                 //this is the one we want to surpress
                 _blocks.Last().Value.Parts!.Remove(_blocks.Last().Value.Parts!.Last());
             }
-
-
         }
 
-        public Dictionary<int, ThreadBlocks> Blocks { get { return _blocks; } }
+        public Dictionary<int, ThreadBlocks> Blocks
+        { get { return _blocks; } }
     }
 }

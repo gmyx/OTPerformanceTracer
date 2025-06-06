@@ -28,5 +28,14 @@ namespace OT_Performance_Tracer.classes
         {
             this.Close();
         }
+
+        private void cAddFilter_Click(object sender, EventArgs e)
+        {
+            fAddEditFilter form = new();
+            if (form.Add(txtMessage.Text) == DialogResult.Cancel) return;
+
+            //add the filter and save
+            LogFilters.addFilter(form.FilterValue);
+        }
     }
 }

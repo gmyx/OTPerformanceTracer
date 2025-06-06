@@ -166,6 +166,8 @@
             lstLines.TabIndex = 0;
             lstLines.UseCompatibleStateImageBehavior = false;
             lstLines.View = View.Details;
+            lstLines.DoubleClick += lstLines_DoubleClick;
+            lstLines.KeyUp += lstLines_KeyUp;
             // 
             // chDateTime
             // 

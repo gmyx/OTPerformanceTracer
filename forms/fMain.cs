@@ -1,8 +1,4 @@
 using OT_Performance_Tracer.classes;
-using System;
-using System.IO;
-using System.Reflection.Emit;
-using System.Windows.Forms;
 
 namespace OT_Performance_Tracer
 {
@@ -80,7 +76,7 @@ namespace OT_Performance_Tracer
 
         private void tvBlocks_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            //change the list view to show the block            
+            //change the list view to show the block
             string blockName = e.Node!.Name;
 
             //see if file or block, if file abort
@@ -221,11 +217,8 @@ namespace OT_Performance_Tracer
 
         private void openInWindowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (lstLines.SelectedItems.Count == 0) return;
-
-            fShowDetails form = new();
-
-            form.ShowDetails(lstLines.SelectedItems[0].SubItems[1].Text);
+            //shunt to common function
+            openShowDetails();
         }
 
         private void btnStats_Click(object sender, EventArgs e)
@@ -244,8 +237,31 @@ namespace OT_Performance_Tracer
 
             fShowDetails form = new();
             form.ShowDetails(singleBlock.stats!);
+        }
 
-            
+        private void lstLines_DoubleClick(object sender, EventArgs e)
+        {
+            //shunt to common function
+            openShowDetails();
+        }
+
+        private void openShowDetails()
+        {
+            if (lstLines.SelectedItems.Count == 0) return;
+
+            fShowDetails form = new();
+
+            form.ShowDetails(lstLines.SelectedItems[0].SubItems[1].Text);
+        }
+
+        private void lstLines_KeyUp(object sender, KeyEventArgs e)
+        {
+            //if key is enter, with no modifyers, open selected item
+            if (e.Alt == true || e.Control == true || e.Shift == true) return;
+            if (e.KeyCode != Keys.Enter) return;
+
+            //shunt to common function
+            openShowDetails();
         }
     }
 }

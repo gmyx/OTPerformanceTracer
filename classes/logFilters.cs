@@ -1,9 +1,4 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OT_Performance_Tracer.classes
 {
@@ -33,7 +28,8 @@ namespace OT_Performance_Tracer.classes
             return lOut;
         }
 
-        public static void setRegistrySettings(string[] filters) {
+        public static void setRegistrySettings(string[] filters)
+        {
             //read from HKCU/Software/OTPerfTrace/Filters
             RegistryKey? lKey = Registry.CurrentUser!.CreateSubKey(rootKey, true);
             lKey.DeleteSubKey(filtersKey, false); //purge old values
@@ -43,7 +39,8 @@ namespace OT_Performance_Tracer.classes
             for (int i = 0; i < filters.Length; i++)
             {
                 lSubKey.SetValue(i.ToString(), filters[i]);
-            };
+            }
+            ;
         }
 
         public static void addFilter(string singleFilter)

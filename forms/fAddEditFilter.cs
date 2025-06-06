@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace OT_Performance_Tracer
+﻿namespace OT_Performance_Tracer
 {
     public partial class fAddEditFilter : Form
     {
@@ -20,7 +9,8 @@ namespace OT_Performance_Tracer
 
         public DialogResult buttonPressed = DialogResult.Cancel;
 
-        public string FilterValue { get { return txtFilter.Text; } }
+        public string FilterValue
+        { get { return txtFilter.Text; } }
 
         public DialogResult Add(string suggested = "")
         {

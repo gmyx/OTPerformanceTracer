@@ -30,6 +30,7 @@
         {
             txtMessage = new TextBox();
             cClose = new Button();
+            cAddFilter = new Button();
             SuspendLayout();
             // 
             // txtMessage
@@ -54,6 +55,16 @@
             cClose.UseVisualStyleBackColor = true;
             cClose.Click += cClose_Click;
             // 
+            // cAddFilter
+            // 
+            cAddFilter.Location = new Point(12, 452);
+            cAddFilter.Name = "cAddFilter";
+            cAddFilter.Size = new Size(94, 23);
+            cAddFilter.TabIndex = 2;
+            cAddFilter.Text = "&Add to Filters";
+            cAddFilter.UseVisualStyleBackColor = true;
+            cAddFilter.Click += cAddFilter_Click;
+            // 
             // fShowDetails
             // 
             AcceptButton = cClose;
@@ -61,6 +72,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = cClose;
             ClientSize = new Size(515, 487);
+            Controls.Add(cAddFilter);
             Controls.Add(cClose);
             Controls.Add(txtMessage);
             Name = "fShowDetails";
@@ -75,5 +87,6 @@
 
         private TextBox txtMessage;
         private Button cClose;
+        private Button cAddFilter;
     }
 }
