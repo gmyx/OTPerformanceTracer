@@ -111,7 +111,10 @@ namespace OT_Performance_Tracer.classes
                             (DateTime timeStamp, string level, string message) lastLine = _blocks[blockCount - 1].Parts!.Last();
                             _blocks[blockCount - 1].Parts!.Remove(_blocks[blockCount - 1].Parts!.Last()); 
 
-                            if (lastLine.message.Contains("DEBUG KFilePrefs::GetKFilePrefs - sharing loaded pref:") == false)
+                            //avoid false positives
+                            if (lastLine.message.Contains("KFilePrefs::GetKFilePrefs - sharing loaded pref:") == false &&
+                                lastLine.message.Contains("Going to raise it to the INFO level during startup ") == false &&
+                                lastLine.message.Contains("ResetLog(): Changing log level from 2 to 0") == false)
                             {                            
                                 //add it current block
                                 currentBlock.Parts!.Add(lastLine);
@@ -180,6 +183,7 @@ namespace OT_Performance_Tracer.classes
             //last line of file could be a late log, causing issue... delete it
             if (_blocks.Last().Value.Parts!.Last().message.Contains("FilePrefs::GetKFilePrefs - sharing loaded pref"))
             {                
+                //unless
                 //this is the one we want to surpress
                 _blocks.Last().Value.Parts!.Remove(_blocks.Last().Value.Parts!.Last());
             }
