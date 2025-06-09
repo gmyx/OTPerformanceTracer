@@ -41,6 +41,7 @@
             cStats = new Button();
             lstLines = new ListView();
             chDateTime = new ColumnHeader();
+            chLevel = new ColumnHeader();
             chData = new ColumnHeader();
             mLstContext = new ContextMenuStrip(components);
             addToFiltersToolStripMenuItem = new ToolStripMenuItem();
@@ -157,7 +158,7 @@
             // lstLines
             // 
             lstLines.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            lstLines.Columns.AddRange(new ColumnHeader[] { chDateTime, chData });
+            lstLines.Columns.AddRange(new ColumnHeader[] { chDateTime, chLevel, chData });
             lstLines.ContextMenuStrip = mLstContext;
             lstLines.FullRowSelect = true;
             lstLines.Location = new Point(0, 32);
@@ -173,6 +174,11 @@
             // 
             chDateTime.Text = "Date / time";
             chDateTime.Width = 150;
+            // 
+            // chLevel
+            // 
+            chLevel.Text = "Level";
+            chLevel.Width = 150;
             // 
             // chData
             // 
@@ -307,5 +313,6 @@
         private ToolStripProgressBar ssProgress;
         private ToolStripStatusLabel ssGap;
         private ToolStripMenuItem openInWindowToolStripMenuItem;
+        private ColumnHeader chLevel;
     }
 }

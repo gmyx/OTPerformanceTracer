@@ -23,7 +23,7 @@
             _type = type;
         }
 
-        public List<(DateTime timeStamp, string message)>? Parts = [];
+        public List<(DateTime timeStamp, string level, string message)>? Parts = [];
         public string? Func;
         public string? Action;
         public string? objID;
@@ -47,12 +47,5 @@
             { BlockTypes.LogLevelChange, "Log level changed to"},
             { BlockTypes.Unkown, "Unkown"}
         };
-
-        /*public readonly static Dictionary<BlockTypes, string> EndIDs = new Dictionary<BlockTypes, string>{
-            { BlockTypes.None, ""},
-            { BlockTypes.Startup, "OScript thread startup finished"},
-            { BlockTypes.Request, "Done with Request on socket" },
-            { BlockTypes.Unkown, "Unkown"}
-        };*/ // no longer used
     }
 }

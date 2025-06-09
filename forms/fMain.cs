@@ -45,6 +45,7 @@ namespace OT_Performance_Tracer
                 tempBlocks.Add($"{FileName}_{block.Key}", block.Value);
             }
 
+            //add this block to the list. need to lock access to avoid thread races
             lock (Blocks)
             {
                 foreach (KeyValuePair<string, ThreadBlocks> singleBlock in tempBlocks)
@@ -53,6 +54,7 @@ namespace OT_Performance_Tracer
                 }
             }
 
+            //update screen, using a lock to avid conflicts
             progress.Report((FileName, parts, redCount));
         }
 
@@ -109,12 +111,13 @@ namespace OT_Performance_Tracer
             lstLines.Items.Clear();
 
             DateTime diffFromPrevious = singleBlock.Parts![0].timeStamp;
-            foreach ((DateTime timeStamp, string message) part in singleBlock.Parts!)
+            foreach ((DateTime timeStamp, string level, string message) part in singleBlock.Parts!)
             {
                 //see if excluded
                 if (LogFilters.getRegistrySettings().Any(part.message.Contains)) continue;
 
                 ListViewItem singleLine = new(part.timeStamp.ToString());
+                singleLine.SubItems.Add(part.level);
                 singleLine.SubItems.Add(part.message);
 
                 //mark red if more than 10 seconds have passed
@@ -202,7 +205,7 @@ namespace OT_Performance_Tracer
         private void addToFiltersToolStripMenuItem_Click(object sender, EventArgs e)
         {
             fAddEditFilter form = new();
-            if (form.Add(lstLines.SelectedItems[0].SubItems[1].Text) == DialogResult.Cancel) return;
+            if (form.Add(lstLines.SelectedItems[0].SubItems[2].Text) == DialogResult.Cancel) return;
 
             //add the filter and save
             LogFilters.addFilter(form.FilterValue);
@@ -251,7 +254,7 @@ namespace OT_Performance_Tracer
 
             fShowDetails form = new();
 
-            form.ShowDetails(lstLines.SelectedItems[0].SubItems[1].Text);
+            form.ShowDetails(lstLines.SelectedItems[0].SubItems[2].Text);
         }
 
         private void lstLines_KeyUp(object sender, KeyEventArgs e)

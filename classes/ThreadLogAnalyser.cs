@@ -43,7 +43,7 @@ namespace OT_Performance_Tracer.classes
             return true;
         }
 
-        private static (DateTime timeStamp, string message) SplitParts(string line)
+        private static (DateTime timeStamp, string level, string message) SplitParts(string line)
         {
             if (line.Length < 19) throw new Exception("Bad date format");
 
@@ -53,7 +53,27 @@ namespace OT_Performance_Tracer.classes
             DateTime dOut;
             if (DateTime.TryParse(datePart, out dOut) == false) throw new Exception("Bad date format");
 
-            return (dOut, line[20..]); // we will want to parse the log level as well, later
+            //now get the next part - the log level
+            //curretly known - DEBUG, INFO, WARN, ERROR
+            string level = ";";
+            string message = "";
+
+            //some lines may be truncated, so can't get a level or details
+            if (line.Length < 24)
+            {
+                message = line[20..];
+            }
+            else
+            {
+                level = line[20..][..5].Trim(); //doesn't seem right, but errors with a negative
+                if (line.Length > 24)
+                {
+                    message = line[25..].Trim(); //there are lines of just INFO and nothing else
+                }
+            }
+
+            return (dOut, level, message);
+            
         }
 
         public void AnalyseFile()
@@ -63,6 +83,7 @@ namespace OT_Performance_Tracer.classes
 
             ThreadBlocks? currentBlock = new(BlockTypes.Unkown);
             DateTime previousDT = DateTime.MinValue;
+            string previousLevel = "";
             int blockCount = 0;
             string blockName = Path.GetFileNameWithoutExtension(_filename);
 
@@ -87,7 +108,7 @@ namespace OT_Performance_Tracer.classes
                         if (StartID.Key == BlockTypes.Request || StartID.Key == BlockTypes.LogLevelChange)
                         {
                             //depends on the previous line                            
-                            (DateTime timeStamp, string message) lastLine = _blocks[blockCount - 1].Parts!.Last();
+                            (DateTime timeStamp, string level, string message) lastLine = _blocks[blockCount - 1].Parts!.Last();
                             _blocks[blockCount - 1].Parts!.Remove(_blocks[blockCount - 1].Parts!.Last()); 
 
                             if (lastLine.message.Contains("DEBUG KFilePrefs::GetKFilePrefs - sharing loaded pref:") == false)
@@ -100,7 +121,7 @@ namespace OT_Performance_Tracer.classes
                 }
 
                 //add the line to the current block
-                (DateTime timeStamp, string message) value;
+                (DateTime timeStamp, string level, string message) value;
 
                 //may not start with a datestamp, such as when outputing WebReports
                 try
@@ -108,6 +129,7 @@ namespace OT_Performance_Tracer.classes
                     //try to split the parts, if it fails, did not start with a date
                     value = SplitParts(line);
                     previousDT = value.timeStamp;
+                    previousLevel = value.level;
                 }
                 catch (Exception e)
                 {
@@ -117,7 +139,7 @@ namespace OT_Performance_Tracer.classes
                         throw;
                     }
 
-                    value = (previousDT, line);
+                    value = (previousDT, previousLevel, line);
                 }
 
                 //see if line contains a portion we want
@@ -157,7 +179,7 @@ namespace OT_Performance_Tracer.classes
 
             //last line of file could be a late log, causing issue... delete it
             if (_blocks.Last().Value.Parts!.Last().message.Contains("FilePrefs::GetKFilePrefs - sharing loaded pref"))
-            {
+            {                
                 //this is the one we want to surpress
                 _blocks.Last().Value.Parts!.Remove(_blocks.Last().Value.Parts!.Last());
             }
