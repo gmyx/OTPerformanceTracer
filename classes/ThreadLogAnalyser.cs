@@ -1,4 +1,5 @@
-﻿using static OT_Performance_Tracer.classes.ThreadBlocks;
+﻿using System.Linq;
+using static OT_Performance_Tracer.classes.ThreadBlocks;
 
 namespace OT_Performance_Tracer.classes
 {
@@ -7,6 +8,12 @@ namespace OT_Performance_Tracer.classes
         private readonly string _filename;
         private string[]? _data = [];
         private Dictionary<int, ThreadBlocks> _blocks;
+
+        private List<string> falsePositives = [
+            "KFilePrefs::GetKFilePrefs - sharing loaded pref:",
+            "Going to raise it to the INFO level during startup",
+            "ResetLog(): Changing log level from 2 to 0"
+        ];
 
         public ThreadLogAnalyser(string filename)
         {
@@ -109,12 +116,10 @@ namespace OT_Performance_Tracer.classes
                         {
                             //depends on the previous line                            
                             (DateTime timeStamp, string level, string message) lastLine = _blocks[blockCount - 1].Parts!.Last();
-                            _blocks[blockCount - 1].Parts!.Remove(_blocks[blockCount - 1].Parts!.Last()); 
+                            _blocks[blockCount - 1].Parts!.Remove(_blocks[blockCount - 1].Parts!.Last());
 
                             //avoid false positives
-                            if (lastLine.message.Contains("KFilePrefs::GetKFilePrefs - sharing loaded pref:") == false &&
-                                lastLine.message.Contains("Going to raise it to the INFO level during startup ") == false &&
-                                lastLine.message.Contains("ResetLog(): Changing log level from 2 to 0") == false)
+                            if (falsePositives.Any(item => lastLine.message.Contains(item)) == false)
                             {                            
                                 //add it current block
                                 currentBlock.Parts!.Add(lastLine);
