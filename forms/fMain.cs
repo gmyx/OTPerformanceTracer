@@ -31,7 +31,7 @@ namespace OT_Performance_Tracer
                 var diff = endTime - startTime;
 
                 TreeNode singlePart = new();
-                singlePart.Text = $"{ThreadBlocks.BlockNames[block.Value.BlockType]} [{diff}]";
+                singlePart.Text = $"{ThreadBlocks.BlockNames[block.Value.BlockType]} [{diff}] [{block.Value.Func}]";
                 singlePart.Name = $"{FileName}_{block.Key}";
                 //set text color red if more than 10 seconds, unless startup, since that is very long
                 if (diff.TotalSeconds > 10 && block.Value.BlockType != ThreadBlocks.BlockTypes.Startup)

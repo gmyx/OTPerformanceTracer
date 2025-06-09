@@ -111,8 +111,8 @@ namespace OT_Performance_Tracer.classes
                         //ThreadBlocks oldBlock = currentBlock!;
                         currentBlock = new ThreadBlocks(StartID.Key);
 
-                        //if block is a request block, one line from previous block belongs here                        
-                        if (StartID.Key == BlockTypes.Request || StartID.Key == BlockTypes.LogLevelChange)
+                        //if block is a request block, one line from previous block belongs here, sometimes                    
+                        /*if (StartID.Key == BlockTypes.Request || StartID.Key == BlockTypes.LogLevelChange)
                         {
                             //depends on the previous line                            
                             (DateTime timeStamp, string level, string message) lastLine = _blocks[blockCount - 1].Parts!.Last();
@@ -123,8 +123,13 @@ namespace OT_Performance_Tracer.classes
                             {                            
                                 //add it current block
                                 currentBlock.Parts!.Add(lastLine);
-                            } // else just drop it
-                        }
+                            } // else just drop it if debug
+                            else if (lastLine.level == "DEBUG") 
+                            {
+                                //add it current block
+                                currentBlock.Parts!.Add(lastLine);
+                            }
+                        }*/
                     }
                 }
 
@@ -151,19 +156,46 @@ namespace OT_Performance_Tracer.classes
                 }
 
                 //see if line contains a portion we want
-                if (line.Contains("func = "))
+                if (line.Contains("func = ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    currentBlock!.Func = line.Split(" = ")[1];
+                    if (currentBlock!.Func == "" || currentBlock!.Func == null) currentBlock!.Func = line.Split(" = ")[1];
                 }
-                else if (line.Contains("objId = "))
+                if (line.Contains("path_info = ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    currentBlock!.objID = line.Split(" = ")[1];
+                    if (currentBlock!.Func == "" || currentBlock!.Func == null) currentBlock!.Func = line.Split(" = ")[1];
                 }
-                else if (line.Contains("objAction = "))
+                else if (line.Contains("objId = ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    currentBlock!.Action = line.Split(" = ")[1];
+                    if (currentBlock!.objID == "" || currentBlock!.objID == null) currentBlock!.objID = line.Split(" = ")[1];
                 }
-                else if (line.Contains("A<1,0,'__ExecutionHandler'"))
+                else if (line.Contains("HTTP_REFERER = ", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    //alternative to func. may have objID, may have objAction
+                    string[] lineParts = line.Split(new char[] { '=', '?', '&' });
+
+                    //now do each subpart seperatly 
+                    for (int indexer = 0; indexer < lineParts.Length; indexer++)
+                    {
+                        if (lineParts[indexer].Contains('%')) continue; //most licky nexturl, ignore
+                        if (lineParts[indexer].Contains("func", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            if (currentBlock!.Func == "" || currentBlock!.Func == null) currentBlock!.Func = lineParts[indexer + 1];
+                        }
+                        else if (lineParts[indexer].Contains("objid", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            if (currentBlock!.objID == "" || currentBlock!.objID == null) currentBlock!.objID = lineParts[indexer + 1];
+                        }
+                        else if (lineParts[indexer].Contains("objAction", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            if (currentBlock!.Action == "" || currentBlock!.Action == null) currentBlock!.Action = lineParts[indexer + 1];
+                        }
+                    }
+                }
+                else if (line.Contains("objAction = ", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    if (currentBlock!.Action == "" || currentBlock!.Action == null) currentBlock!.Action = line.Split(" = ")[1];
+                }
+                else if (line.Contains("A<1,0,'__ExecutionHandler'", StringComparison.InvariantCultureIgnoreCase))
                 {
                     //this is the stats block
                     currentBlock!.stats = line;
