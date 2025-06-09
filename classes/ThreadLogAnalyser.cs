@@ -102,6 +102,7 @@ namespace OT_Performance_Tracer.classes
             string previousLevel = "";
             int blockCount = 0;
             string blockName = Path.GetFileNameWithoutExtension(_filename);
+            bool foundDebug = false; //not my prefered way, but works
 
             foreach (string line in _data)
             {
@@ -121,7 +122,7 @@ namespace OT_Performance_Tracer.classes
                         currentBlock = new ThreadBlocks(StartID.Key);
 
                         //if block is a request block, one line from previous block belongs here, sometimes                    
-                        /*if (StartID.Key == BlockTypes.Request || StartID.Key == BlockTypes.LogLevelChange)
+                        if ((StartID.Key == BlockTypes.Request || StartID.Key == BlockTypes.LogLevelChange) && foundDebug == true)
                         {
                             //depends on the previous line                            
                             (DateTime timeStamp, string level, string message) lastLine = _blocks[blockCount - 1].Parts!.Last();
@@ -136,9 +137,9 @@ namespace OT_Performance_Tracer.classes
                             else if (lastLine.level == "DEBUG") 
                             {
                                 //add it current block
-                                currentBlock.Parts!.Add(lastLine);
+                                //currentBlock.Parts!.Add(lastLine);
                             }
-                        }*/
+                        }
                     }
                 }
 
@@ -152,6 +153,7 @@ namespace OT_Performance_Tracer.classes
                     value = SplitParts(line);
                     previousDT = value.timeStamp;
                     previousLevel = value.level;
+                    if (value.level == "DEBUG") foundDebug = true;
                 }
                 catch (Exception e)
                 {
