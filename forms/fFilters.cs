@@ -4,16 +4,24 @@ namespace OT_Performance_Tracer
 {
     public partial class fFilters : Form
     {
+
+        private LogFilters.FilterTypes _filterType;
         public fFilters()
         {
             InitializeComponent();
-            UpdateList();
         }
 
-        private void UpdateList()
+        internal void ShowList(LogFilters.FilterTypes filterType)
+        {
+            _filterType = filterType;
+            UpdateList(_filterType);
+            this.ShowDialog();
+        }
+
+        private void UpdateList(LogFilters.FilterTypes filterType)
         {
             //read registry
-            string[] filters = LogFilters.getRegistrySettings();
+            string[] filters = LogFilters.getRegistrySettings(filterType);
 
             //create list items
             foreach (string filter in filters)
@@ -31,7 +39,7 @@ namespace OT_Performance_Tracer
                 data = [.. data, filter.Text];
             }
 
-            LogFilters.setRegistrySettings(data);
+            LogFilters.setRegistrySettings(data, _filterType);
 
             this.Close();
         }

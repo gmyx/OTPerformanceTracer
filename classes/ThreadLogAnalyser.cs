@@ -83,6 +83,15 @@ namespace OT_Performance_Tracer.classes
             
         }
 
+        private string filterQuotes(string message)
+        {
+            if (message.Length < 2) return message;
+            if (message.StartsWith('\'') == false) return message;
+            if (message.EndsWith('\'') == false) return message;
+            return message[1..][..^1];
+
+        }
+
         public void AnalyseFile()
         {
             //go each line at a time and find different blocks
@@ -158,15 +167,15 @@ namespace OT_Performance_Tracer.classes
                 //see if line contains a portion we want
                 if (line.Contains("func = ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (currentBlock!.Func == "" || currentBlock!.Func == null) currentBlock!.Func = line.Split(" = ")[1];
+                    if (currentBlock!.Func == "" || currentBlock!.Func == null) currentBlock!.Func = filterQuotes(line.Split(" = ")[1]);
                 }
                 if (line.Contains("path_info = ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (currentBlock!.Func == "" || currentBlock!.Func == null) currentBlock!.Func = line.Split(" = ")[1];
+                    if (currentBlock!.Func == "" || currentBlock!.Func == null) currentBlock!.Func = filterQuotes(line.Split(" = ")[1]);
                 }
                 else if (line.Contains("objId = ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (currentBlock!.objID == "" || currentBlock!.objID == null) currentBlock!.objID = line.Split(" = ")[1];
+                    if (currentBlock!.objID == "" || currentBlock!.objID == null) currentBlock!.objID = filterQuotes(line.Split(" = ")[1]);
                 }
                 else if (line.Contains("HTTP_REFERER = ", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -179,21 +188,21 @@ namespace OT_Performance_Tracer.classes
                         if (lineParts[indexer].Contains('%')) continue; //most licky nexturl, ignore
                         if (lineParts[indexer].Contains("func", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            if (currentBlock!.Func == "" || currentBlock!.Func == null) currentBlock!.Func = lineParts[indexer + 1];
+                            if (currentBlock!.Func == "" || currentBlock!.Func == null) currentBlock!.Func = filterQuotes(lineParts[indexer + 1]);
                         }
                         else if (lineParts[indexer].Contains("objid", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            if (currentBlock!.objID == "" || currentBlock!.objID == null) currentBlock!.objID = lineParts[indexer + 1];
+                            if (currentBlock!.objID == "" || currentBlock!.objID == null) currentBlock!.objID = filterQuotes(lineParts[indexer + 1]);
                         }
                         else if (lineParts[indexer].Contains("objAction", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            if (currentBlock!.Action == "" || currentBlock!.Action == null) currentBlock!.Action = lineParts[indexer + 1];
+                            if (currentBlock!.Action == "" || currentBlock!.Action == null) currentBlock!.Action = filterQuotes(lineParts[indexer + 1]);
                         }
                     }
                 }
                 else if (line.Contains("objAction = ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (currentBlock!.Action == "" || currentBlock!.Action == null) currentBlock!.Action = line.Split(" = ")[1];
+                    if (currentBlock!.Action == "" || currentBlock!.Action == null) currentBlock!.Action = filterQuotes(line.Split(" = ")[1]);
                 }
                 else if (line.Contains("A<1,0,'__ExecutionHandler'", StringComparison.InvariantCultureIgnoreCase))
                 {

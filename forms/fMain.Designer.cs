@@ -34,7 +34,10 @@
             loadFolderToolStripMenuItem = new ToolStripMenuItem();
             loadThreadLogToolStripMenuItem = new ToolStripMenuItem();
             filterToolStripMenuItem = new ToolStripMenuItem();
+            logViewFiltersToolStripMenuItem = new ToolStripMenuItem();
             showFiltersToolStripMenuItem = new ToolStripMenuItem();
+            threadListFiltersToolStripMenuItem = new ToolStripMenuItem();
+            filterThreadFuncToolStripMenuItem = new ToolStripMenuItem();
             openThreadLogDialog = new OpenFileDialog();
             splitContainer1 = new SplitContainer();
             tvBlocks = new TreeView();
@@ -67,10 +70,12 @@
             // 
             // mMenu
             // 
+            mMenu.ImageScalingSize = new Size(36, 36);
             mMenu.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, filterToolStripMenuItem });
             mMenu.Location = new Point(0, 0);
             mMenu.Name = "mMenu";
-            mMenu.Size = new Size(1129, 24);
+            mMenu.Padding = new Padding(13, 5, 0, 5);
+            mMenu.Size = new Size(2419, 53);
             mMenu.TabIndex = 1;
             mMenu.Text = "menuStrip1";
             // 
@@ -78,36 +83,57 @@
             // 
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadFolderToolStripMenuItem, loadThreadLogToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(37, 20);
+            fileToolStripMenuItem.Size = new Size(80, 43);
             fileToolStripMenuItem.Text = "&File";
             // 
             // loadFolderToolStripMenuItem
             // 
             loadFolderToolStripMenuItem.Name = "loadFolderToolStripMenuItem";
-            loadFolderToolStripMenuItem.Size = new Size(158, 22);
+            loadFolderToolStripMenuItem.Size = new Size(358, 48);
             loadFolderToolStripMenuItem.Text = "Load Folder";
             loadFolderToolStripMenuItem.Click += loadFolderToolStripMenuItem_Click;
             // 
             // loadThreadLogToolStripMenuItem
             // 
             loadThreadLogToolStripMenuItem.Name = "loadThreadLogToolStripMenuItem";
-            loadThreadLogToolStripMenuItem.Size = new Size(158, 22);
+            loadThreadLogToolStripMenuItem.Size = new Size(358, 48);
             loadThreadLogToolStripMenuItem.Text = "Load Single Log";
             loadThreadLogToolStripMenuItem.Click += loadThreadLogToolStripMenuItem_Click;
             // 
             // filterToolStripMenuItem
             // 
-            filterToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showFiltersToolStripMenuItem });
+            filterToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { logViewFiltersToolStripMenuItem, threadListFiltersToolStripMenuItem });
             filterToolStripMenuItem.Name = "filterToolStripMenuItem";
-            filterToolStripMenuItem.Size = new Size(45, 20);
+            filterToolStripMenuItem.Size = new Size(98, 43);
             filterToolStripMenuItem.Text = "Filter";
+            // 
+            // logViewFiltersToolStripMenuItem
+            // 
+            logViewFiltersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showFiltersToolStripMenuItem });
+            logViewFiltersToolStripMenuItem.Name = "logViewFiltersToolStripMenuItem";
+            logViewFiltersToolStripMenuItem.Size = new Size(403, 48);
+            logViewFiltersToolStripMenuItem.Text = "Log View Filters";
             // 
             // showFiltersToolStripMenuItem
             // 
             showFiltersToolStripMenuItem.Name = "showFiltersToolStripMenuItem";
-            showFiltersToolStripMenuItem.Size = new Size(137, 22);
+            showFiltersToolStripMenuItem.Size = new Size(309, 48);
             showFiltersToolStripMenuItem.Text = "Show Filters";
             showFiltersToolStripMenuItem.Click += showFiltersToolStripMenuItem_Click;
+            // 
+            // threadListFiltersToolStripMenuItem
+            // 
+            threadListFiltersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { filterThreadFuncToolStripMenuItem });
+            threadListFiltersToolStripMenuItem.Name = "threadListFiltersToolStripMenuItem";
+            threadListFiltersToolStripMenuItem.Size = new Size(403, 48);
+            threadListFiltersToolStripMenuItem.Text = "Thread List Filters";
+            // 
+            // filterThreadFuncToolStripMenuItem
+            // 
+            filterThreadFuncToolStripMenuItem.Name = "filterThreadFuncToolStripMenuItem";
+            filterThreadFuncToolStripMenuItem.Size = new Size(403, 48);
+            filterThreadFuncToolStripMenuItem.Text = "Filter Thread Func";
+            filterThreadFuncToolStripMenuItem.Click += filterThreadFuncToolStripMenuItem_Click;
             // 
             // openThreadLogDialog
             // 
@@ -119,7 +145,8 @@
             // splitContainer1
             // 
             splitContainer1.Dock = DockStyle.Fill;
-            splitContainer1.Location = new Point(0, 24);
+            splitContainer1.Location = new Point(0, 53);
+            splitContainer1.Margin = new Padding(6, 7, 6, 7);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -130,8 +157,9 @@
             // 
             splitContainer1.Panel2.Controls.Add(cStats);
             splitContainer1.Panel2.Controls.Add(lstLines);
-            splitContainer1.Size = new Size(1129, 584);
-            splitContainer1.SplitterDistance = 376;
+            splitContainer1.Size = new Size(2419, 1447);
+            splitContainer1.SplitterDistance = 805;
+            splitContainer1.SplitterWidth = 9;
             splitContainer1.TabIndex = 2;
             // 
             // tvBlocks
@@ -139,17 +167,19 @@
             tvBlocks.Dock = DockStyle.Fill;
             tvBlocks.HideSelection = false;
             tvBlocks.Location = new Point(0, 0);
+            tvBlocks.Margin = new Padding(6, 7, 6, 7);
             tvBlocks.Name = "tvBlocks";
-            tvBlocks.Size = new Size(376, 584);
+            tvBlocks.Size = new Size(805, 1447);
             tvBlocks.TabIndex = 1;
             tvBlocks.AfterSelect += tvBlocks_AfterSelect;
             // 
             // cStats
             // 
             cStats.Enabled = false;
-            cStats.Location = new Point(687, 2);
+            cStats.Location = new Point(1472, 5);
+            cStats.Margin = new Padding(6, 7, 6, 7);
             cStats.Name = "cStats";
-            cStats.Size = new Size(50, 23);
+            cStats.Size = new Size(107, 57);
             cStats.TabIndex = 5;
             cStats.Text = "Stats";
             cStats.UseVisualStyleBackColor = true;
@@ -161,9 +191,10 @@
             lstLines.Columns.AddRange(new ColumnHeader[] { chDateTime, chLevel, chData });
             lstLines.ContextMenuStrip = mLstContext;
             lstLines.FullRowSelect = true;
-            lstLines.Location = new Point(0, 32);
+            lstLines.Location = new Point(0, 79);
+            lstLines.Margin = new Padding(6, 7, 6, 7);
             lstLines.Name = "lstLines";
-            lstLines.Size = new Size(749, 527);
+            lstLines.Size = new Size(1600, 1300);
             lstLines.TabIndex = 0;
             lstLines.UseCompatibleStateImageBehavior = false;
             lstLines.View = View.Details;
@@ -187,75 +218,78 @@
             // 
             // mLstContext
             // 
+            mLstContext.ImageScalingSize = new Size(36, 36);
             mLstContext.Items.AddRange(new ToolStripItem[] { addToFiltersToolStripMenuItem, openInWindowToolStripMenuItem });
             mLstContext.Name = "mLstContext";
-            mLstContext.Size = new Size(164, 48);
+            mLstContext.Size = new Size(295, 92);
             mLstContext.Opening += mLstContext_Opening;
             // 
             // addToFiltersToolStripMenuItem
             // 
             addToFiltersToolStripMenuItem.Name = "addToFiltersToolStripMenuItem";
-            addToFiltersToolStripMenuItem.Size = new Size(163, 22);
+            addToFiltersToolStripMenuItem.Size = new Size(294, 44);
             addToFiltersToolStripMenuItem.Text = "Add to Filters";
             addToFiltersToolStripMenuItem.Click += addToFiltersToolStripMenuItem_Click;
             // 
             // openInWindowToolStripMenuItem
             // 
             openInWindowToolStripMenuItem.Name = "openInWindowToolStripMenuItem";
-            openInWindowToolStripMenuItem.Size = new Size(163, 22);
+            openInWindowToolStripMenuItem.Size = new Size(294, 44);
             openInWindowToolStripMenuItem.Text = "Open in Window";
             openInWindowToolStripMenuItem.Click += openInWindowToolStripMenuItem_Click;
             // 
             // ssData
             // 
+            ssData.ImageScalingSize = new Size(36, 36);
             ssData.Items.AddRange(new ToolStripItem[] { sslNodeID, sslFunc, sslAction, sslObjID, sslPerformer, sslRuntime, ssGap, ssProgress });
-            ssData.Location = new Point(0, 586);
+            ssData.Location = new Point(0, 1452);
             ssData.Name = "ssData";
-            ssData.Size = new Size(1129, 22);
+            ssData.Padding = new Padding(2, 0, 30, 0);
+            ssData.Size = new Size(2419, 48);
             ssData.TabIndex = 3;
             ssData.Text = "statusStrip1";
             // 
             // sslNodeID
             // 
             sslNodeID.Name = "sslNodeID";
-            sslNodeID.Size = new Size(0, 17);
+            sslNodeID.Size = new Size(0, 37);
             // 
             // sslFunc
             // 
             sslFunc.Name = "sslFunc";
-            sslFunc.Size = new Size(0, 17);
+            sslFunc.Size = new Size(0, 37);
             // 
             // sslAction
             // 
             sslAction.Name = "sslAction";
-            sslAction.Size = new Size(0, 17);
+            sslAction.Size = new Size(0, 37);
             // 
             // sslObjID
             // 
             sslObjID.Name = "sslObjID";
-            sslObjID.Size = new Size(0, 17);
+            sslObjID.Size = new Size(0, 37);
             // 
             // sslPerformer
             // 
             sslPerformer.Name = "sslPerformer";
-            sslPerformer.Size = new Size(0, 17);
+            sslPerformer.Size = new Size(0, 37);
             // 
             // sslRuntime
             // 
             sslRuntime.Name = "sslRuntime";
-            sslRuntime.Size = new Size(13, 17);
+            sslRuntime.Size = new Size(32, 37);
             sslRuntime.Text = "0";
             // 
             // ssGap
             // 
             ssGap.Name = "ssGap";
-            ssGap.Size = new Size(1101, 17);
+            ssGap.Size = new Size(2355, 37);
             ssGap.Spring = true;
             // 
             // ssProgress
             // 
             ssProgress.Name = "ssProgress";
-            ssProgress.Size = new Size(100, 16);
+            ssProgress.Size = new Size(214, 34);
             ssProgress.Visible = false;
             // 
             // folderLogBrowserDialog
@@ -264,13 +298,14 @@
             // 
             // fMain
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(15F, 37F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1129, 608);
+            ClientSize = new Size(2419, 1500);
             Controls.Add(ssData);
             Controls.Add(splitContainer1);
             Controls.Add(mMenu);
             MainMenuStrip = mMenu;
+            Margin = new Padding(6, 7, 6, 7);
             Name = "fMain";
             Text = "OT Performance Tracer";
             mMenu.ResumeLayout(false);
@@ -305,7 +340,6 @@
         private ToolStripStatusLabel sslPerformer;
         private ToolStripStatusLabel sslRuntime;
         private ToolStripMenuItem filterToolStripMenuItem;
-        private ToolStripMenuItem showFiltersToolStripMenuItem;
         private ToolStripMenuItem loadFolderToolStripMenuItem;
         private FolderBrowserDialog folderLogBrowserDialog;
         private ContextMenuStrip mLstContext;
@@ -314,5 +348,9 @@
         private ToolStripStatusLabel ssGap;
         private ToolStripMenuItem openInWindowToolStripMenuItem;
         private ColumnHeader chLevel;
+        private ToolStripMenuItem logViewFiltersToolStripMenuItem;
+        private ToolStripMenuItem showFiltersToolStripMenuItem;
+        private ToolStripMenuItem threadListFiltersToolStripMenuItem;
+        private ToolStripMenuItem filterThreadFuncToolStripMenuItem;
     }
 }

@@ -24,8 +24,14 @@ namespace OT_Performance_Tracer
             //now show each block in the tree
             Dictionary<string, ThreadBlocks> tempBlocks = [];
             int redCount = 0;
+            string[] filters = LogFilters.getRegistrySettings(LogFilters.FilterTypes.ThreadFilter);
             foreach (KeyValuePair<int, ThreadBlocks> block in singleThreadBlocks)
             {
+                //see if its in the filtered list
+                if (block.Value.Func != null) //we wil not filter nulls
+                {
+                    if (filters.Any(item => block.Value.Func!.Contains(item))) continue;
+                }
                 DateTime startTime = block.Value.Parts!.First().timeStamp;
                 DateTime endTime = block.Value.Parts!.Last().timeStamp;
                 var diff = endTime - startTime;
@@ -114,7 +120,7 @@ namespace OT_Performance_Tracer
             foreach ((DateTime timeStamp, string level, string message) part in singleBlock.Parts!)
             {
                 //see if excluded
-                if (LogFilters.getRegistrySettings().Any(part.message.Contains)) continue;
+                if (LogFilters.getRegistrySettings(LogFilters.FilterTypes.Logfilter).Any(part.message.Contains)) continue;
 
                 ListViewItem singleLine = new(part.timeStamp.ToString());
                 singleLine.SubItems.Add(part.level);
@@ -199,7 +205,7 @@ namespace OT_Performance_Tracer
         {
             fFilters f = new();
 
-            f.ShowDialog();
+            f.ShowList(LogFilters.FilterTypes.Logfilter);
         }
 
         private void addToFiltersToolStripMenuItem_Click(object sender, EventArgs e)
@@ -208,7 +214,7 @@ namespace OT_Performance_Tracer
             if (form.Add(lstLines.SelectedItems[0].SubItems[2].Text) == DialogResult.Cancel) return;
 
             //add the filter and save
-            LogFilters.addFilter(form.FilterValue);
+            LogFilters.addFilter(form.FilterValue, LogFilters.FilterTypes.Logfilter);
 
             //reload screen
         }
@@ -265,6 +271,22 @@ namespace OT_Performance_Tracer
 
             //shunt to common function
             openShowDetails();
+        }
+
+        private void filterThreadFuncToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tvBlocks.SelectedNode  == null) return;
+
+            //get the block
+            int blockIndex = int.Parse(tvBlocks.SelectedNode.Name.Split("_")[1]);
+            ThreadBlocks? singleBlock;
+            if (Blocks.TryGetValue(tvBlocks.SelectedNode.Name, out singleBlock) == false) return; //something went wrong
+
+            fAddEditFilter form = new();
+            if ( form.Add(singleBlock.Func!) == DialogResult.Cancel) return;
+
+            //add the filter and save
+            LogFilters.addFilter(form.FilterValue, LogFilters.FilterTypes.ThreadFilter);
         }
     }
 }
