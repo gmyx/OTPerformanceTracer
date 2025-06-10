@@ -35,7 +35,7 @@ namespace OT_Performance_Tracer.classes
             if (form.Add(txtMessage.Text) == DialogResult.Cancel) return;
 
             //add the filter and save
-            LogFilters.addFilter(form.FilterValue, LogFilters.FilterTypes.Logfilter);
+            Settings.addFilter(form.FilterValue, Settings.FilterTypes.Logfilter);
         }
     }
 }

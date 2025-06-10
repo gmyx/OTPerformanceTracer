@@ -16,3 +16,7 @@
 * tag logs for note taking (e.g. say this log is important)
 * search logs
 * better filters (e.g. regex)
+* recent files / recent folders
+
+## changes to do
+* there is some code from the main form that should be in a class instead, such as initiating the loading of files

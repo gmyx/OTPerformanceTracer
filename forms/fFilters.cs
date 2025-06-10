@@ -5,23 +5,23 @@ namespace OT_Performance_Tracer
     public partial class fFilters : Form
     {
 
-        private LogFilters.FilterTypes _filterType;
+        private Settings.FilterTypes _filterType;
         public fFilters()
         {
             InitializeComponent();
         }
 
-        internal void ShowList(LogFilters.FilterTypes filterType)
+        internal void ShowList(Settings.FilterTypes filterType)
         {
             _filterType = filterType;
             UpdateList(_filterType);
             this.ShowDialog();
         }
 
-        private void UpdateList(LogFilters.FilterTypes filterType)
+        private void UpdateList(Settings.FilterTypes filterType)
         {
             //read registry
-            string[] filters = LogFilters.getRegistrySettings(filterType);
+            string[] filters = Settings.LoadFilters(filterType);
 
             //create list items
             foreach (string filter in filters)
@@ -39,7 +39,7 @@ namespace OT_Performance_Tracer
                 data = [.. data, filter.Text];
             }
 
-            LogFilters.setRegistrySettings(data, _filterType);
+            Settings.SaveFilters(data, _filterType);
 
             this.Close();
         }

@@ -1,4 +1,5 @@
 using OT_Performance_Tracer.classes;
+using System.Windows.Forms.VisualStyles;
 
 namespace OT_Performance_Tracer
 {
@@ -7,11 +8,137 @@ namespace OT_Performance_Tracer
         public fMain()
         {
             InitializeComponent();
+            LoadRecentItemsLists();
         }
 
         private Dictionary<string, ThreadBlocks> Blocks = [];
 
-        private void LoadSingleFile(string path, TreeNode rootNode, IProgress<(string, TreeNode[], int)> progress)
+        private void loadFoldersFromRecent()
+        {
+            string[] recentFolders = Settings.LoadRecents(Settings.RecentTypes.Folder);
+            if (recentFolders.Length == 0 || recentFolders == null) return;
+
+            //clear up folder list first
+            recentFolderMenuItem.DropDownItems.Clear();
+
+            //now add the folders
+            foreach (string folder in recentFolders)
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem();
+                item.Text = folder;
+                item.Click += new EventHandler(loadFolder);
+                recentFolderMenuItem.DropDownItems.Add(item);
+            }
+        }
+
+        private void LoadFilesFromRecent()
+        {
+            string[] recentFiles = Settings.LoadRecents(Settings.RecentTypes.SingleFile);
+            if (recentFiles.Length == 0 || recentFiles == null) return;
+
+            //clear up folder list first
+            recentFilesMenuItem.DropDownItems.Clear();
+
+            //now add the folders
+            foreach (string folder in recentFiles)
+            {
+                ToolStripMenuItem item = new ToolStripMenuItem();
+                item.Text = folder;
+                item.Click += new EventHandler(loadFile);
+                recentFilesMenuItem.DropDownItems.Add(item);
+            }
+        }
+
+        private void LoadRecentItemsLists()
+        {
+            loadFoldersFromRecent();
+            LoadFilesFromRecent();        
+        }
+
+        private void loadFolder(object sender, EventArgs e)
+        {
+            if (sender == null) return;
+
+            //sender is the individual item
+            doLoadFolder(((ToolStripMenuItem)sender).Text!);
+        }
+
+        private void loadFile(object sender, EventArgs e)
+        {
+            if (sender == null) return;
+
+            //sender is the individual item
+            //doLoadFolder(((ToolStripMenuItem)sender).Text!);
+        }
+
+        private void doLoadFolder(string folderToLoad)
+        {
+            //clear out the tree and list views
+            tvBlocks.Nodes.Clear();
+            lstLines.Items.Clear();
+            Blocks.Clear();
+
+            //for each file in the folder, try to load it
+            string[] files = Directory.GetFiles(folderToLoad);
+
+            //prepare status bar
+            ssProgress.Visible = true;
+            ssProgress.Value = 0;
+
+            int max = files.Length;
+            int current = 0;
+
+            var progress = new Progress<(string, TreeNode[], int)>(value =>
+            {
+                current++;
+                float per = ((float)current / (float)max) * 100;
+                ssProgress.Value = (int)Math.Floor(per);
+
+                //update the tree node
+                UpdateTreeNode(value.Item1, value.Item2, value.Item3);
+
+                if (current >= max) ssProgress.Visible = false;
+            });
+
+            //Thread[] threads = [];
+            tvBlocks.SuspendLayout();
+            foreach (string file in files)
+            {
+                //create the parent node
+                string FileName = Path.GetFileNameWithoutExtension(file);
+                TreeNode fileNode = tvBlocks.Nodes.Add(FileName, FileName);
+            }
+            tvBlocks.ResumeLayout();
+            tvBlocks.PerformLayout();
+
+            Thread.Sleep(1000); //allow form to catch up
+
+            foreach (string file in files)
+            {
+                string FileName = Path.GetFileNameWithoutExtension(file);
+                TreeNode? fileNode = tvBlocks.Nodes[FileName];
+                _ = Task.Factory.StartNew(() => TaskLoadSingleFile(file, fileNode!, progress), TaskCreationOptions.LongRunning);
+            }
+        }
+
+        private void doLoadSinglefile(string filename)
+        {
+            //open thread log dialog
+            var progress = new Progress<(string, TreeNode[], int)>(value =>
+            {
+                //update tree node
+                UpdateTreeNode(value.Item1, value.Item2, value.Item3);
+            });
+            string ShortFileName = Path.GetFileNameWithoutExtension(filename);
+
+            //create node
+            TreeNode fileNode = tvBlocks.Nodes.Add(ShortFileName, ShortFileName);
+
+            _ = Task.Factory.StartNew(() => TaskLoadSingleFile(openThreadLogDialog.FileName, fileNode!, progress), TaskCreationOptions.LongRunning);
+        }
+
+        //this function probably belongs in seperate file
+        private void TaskLoadSingleFile(string path, TreeNode rootNode, IProgress<(string, TreeNode[], int)> progress)
         {
             ThreadLogAnalyser lThread = new ThreadLogAnalyser(path);
             if (lThread.LoadFile()) lThread.AnalyseFile();
@@ -24,7 +151,7 @@ namespace OT_Performance_Tracer
             //now show each block in the tree
             Dictionary<string, ThreadBlocks> tempBlocks = [];
             int redCount = 0;
-            string[] filters = LogFilters.getRegistrySettings(LogFilters.FilterTypes.ThreadFilter);
+            string[] filters = Settings.LoadFilters(Settings.FilterTypes.ThreadFilter);
             foreach (KeyValuePair<int, ThreadBlocks> block in singleThreadBlocks)
             {
                 //see if its in the filtered list
@@ -72,20 +199,17 @@ namespace OT_Performance_Tracer
 
         private void loadThreadLogToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //open thread log dialog
             if (openThreadLogDialog.ShowDialog() != DialogResult.OK) return;
 
-            var progress = new Progress<(string, TreeNode[], int)>(value =>
-            {
-                //update tree node
-                UpdateTreeNode(value.Item1, value.Item2, value.Item3);
-            });
-            string FileName = Path.GetFileNameWithoutExtension(openThreadLogDialog.FileName);
+            doLoadSinglefile(openThreadLogDialog.FileName);
 
-            //create node
-            TreeNode fileNode = tvBlocks.Nodes.Add(FileName, FileName);
+            //now add to recents list
+            List<string> recents = [.. Settings.LoadRecents(Settings.RecentTypes.SingleFile)];
+            recents.Insert(0, openThreadLogDialog.FileName);
+            Settings.SaveRecents(recents.Distinct().ToArray(), Settings.RecentTypes.SingleFile);
 
-            _ = Task.Factory.StartNew(() => LoadSingleFile(openThreadLogDialog.FileName, fileNode!, progress), TaskCreationOptions.LongRunning);
+            //update screen
+            LoadRecentItemsLists();
         }
 
         private void tvBlocks_AfterSelect(object sender, TreeViewEventArgs e)
@@ -126,7 +250,7 @@ namespace OT_Performance_Tracer
             foreach ((DateTime timeStamp, string level, string message) part in singleBlock.Parts!)
             {
                 //see if excluded
-                if (LogFilters.getRegistrySettings(LogFilters.FilterTypes.Logfilter).Any(part.message.Contains)) continue;
+                if (Settings.LoadFilters(Settings.FilterTypes.Logfilter).Any(part.message.Contains)) continue;
 
                 ListViewItem singleLine = new(part.timeStamp.ToString());
                 singleLine.SubItems.Add(part.level);
@@ -139,7 +263,7 @@ namespace OT_Performance_Tracer
             }
 
             //finish up
-            lstLines.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lstLines.Columns[2].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
             lstLines.ResumeLayout();
         }
 
@@ -159,59 +283,22 @@ namespace OT_Performance_Tracer
         {
             if (folderLogBrowserDialog.ShowDialog() != DialogResult.OK) return;
 
-            //clear out the tree and list views
-            tvBlocks.Nodes.Clear();
-            lstLines.Items.Clear();
-            Blocks.Clear();
+            doLoadFolder(folderLogBrowserDialog.SelectedPath);
 
-            //for each file in the folder, try to load it
-            string[] files = Directory.GetFiles(folderLogBrowserDialog.SelectedPath);
+            //got here, so save to recents list
+            List<string> recents = [.. Settings.LoadRecents(Settings.RecentTypes.Folder)];
+            recents.Insert(0, folderLogBrowserDialog.SelectedPath);
+            Settings.SaveRecents(recents.Distinct().ToArray(), Settings.RecentTypes.Folder);
 
-            //prepare status bar
-            ssProgress.Visible = true;
-            ssProgress.Value = 0;
-
-            int max = files.Length;
-            int current = 0;
-
-            var progress = new Progress<(string, TreeNode[], int)>(value =>
-            {
-                current++;
-                float per = ((float)current / (float)max) * 100;
-                ssProgress.Value = (int)Math.Floor(per);
-
-                //update the tree node
-                UpdateTreeNode(value.Item1, value.Item2, value.Item3);
-
-                if (current >= max) ssProgress.Visible = false;
-            });
-
-            //Thread[] threads = [];
-            tvBlocks.SuspendLayout();
-            foreach (string file in files)
-            {
-                //create the parent node
-                string FileName = Path.GetFileNameWithoutExtension(file);
-                TreeNode fileNode = tvBlocks.Nodes.Add(FileName, FileName);
-            }
-            tvBlocks.ResumeLayout();
-            tvBlocks.PerformLayout();
-
-            Thread.Sleep(1000); //allow form to catch up
-
-            foreach (string file in files)
-            {
-                string FileName = Path.GetFileNameWithoutExtension(file);
-                TreeNode? fileNode = tvBlocks.Nodes[FileName];
-                _ = Task.Factory.StartNew(() => LoadSingleFile(file, fileNode!, progress), TaskCreationOptions.LongRunning);
-            }
+            //update screen
+            LoadRecentItemsLists();
         }
 
         private void showFiltersToolStripMenuItem_Click(object sender, EventArgs e)
         {
             fFilters f = new();
 
-            f.ShowList(LogFilters.FilterTypes.Logfilter);
+            f.ShowList(Settings.FilterTypes.Logfilter);
         }
 
         private void addToFiltersToolStripMenuItem_Click(object sender, EventArgs e)
@@ -280,7 +367,7 @@ namespace OT_Performance_Tracer
             if (form.Add(lstLines.SelectedItems[0].SubItems[2].Text) == DialogResult.Cancel) return;
 
             //add the filter and save
-            LogFilters.addFilter(form.FilterValue, LogFilters.FilterTypes.Logfilter);
+            Settings.addFilter(form.FilterValue, Settings.FilterTypes.Logfilter);
 
             //reload screen
         }
@@ -298,7 +385,7 @@ namespace OT_Performance_Tracer
             if (form.Add(singleBlock.Func!) == DialogResult.Cancel) return;
 
             //add the filter and save
-            LogFilters.addFilter(form.FilterValue, LogFilters.FilterTypes.ThreadFilter);
+            Settings.addFilter(form.FilterValue, Settings.FilterTypes.ThreadFilter);
 
             //reload - missing
         }
@@ -322,7 +409,7 @@ namespace OT_Performance_Tracer
         {
             fFilters f = new();
 
-            f.ShowList(LogFilters.FilterTypes.ThreadFilter);
+            f.ShowList(Settings.FilterTypes.ThreadFilter);
         }
     }
 }
