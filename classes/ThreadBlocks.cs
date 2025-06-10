@@ -8,6 +8,7 @@
             Startup,
             Request,
             LogLevelChange,
+            ThreadShutdown,
             Unkown
         }
 
@@ -37,6 +38,7 @@
             { BlockTypes.Startup, "Thread Startup"},
             { BlockTypes.Request, "Request"},
             { BlockTypes.LogLevelChange, "Log level changed"},
+            { BlockTypes.ThreadShutdown, "Thread Shutdown" },
             { BlockTypes.Unkown, "Unkown"}
          };
 
@@ -45,6 +47,7 @@
             { BlockTypes.Startup, "OScript thread startup begins"},
             { BlockTypes.Request, "Processing Request on socket"},
             { BlockTypes.LogLevelChange, "Log level changed to"},
+            { BlockTypes.ThreadShutdown, "Stopping thread" },
             { BlockTypes.Unkown, "Unkown"}
         };
     }
