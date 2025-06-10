@@ -248,11 +248,13 @@ namespace OT_Performance_Tracer
             lstLines.SuspendLayout(); //many writes, so don't update with every add
             lstLines.Items.Clear();
 
+            //this can take a LONG time to run, maybe move to task
             DateTime diffFromPrevious = singleBlock.Parts![0].timeStamp;
+            string[] filters = Settings.LoadFilters(Settings.FilterTypes.Logfilter); //preload filters
             foreach ((DateTime timeStamp, string level, string message) part in singleBlock.Parts!)
             {
                 //see if excluded
-                if (Settings.LoadFilters(Settings.FilterTypes.Logfilter).Any(part.message.Contains)) continue;
+                if (filters.Any(part.message.Contains)) continue;
 
                 ListViewItem singleLine = new(part.timeStamp.ToString());
                 singleLine.SubItems.Add(part.level);
