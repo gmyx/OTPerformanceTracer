@@ -214,41 +214,12 @@ namespace OT_Performance_Tracer
             LoadRecentItemsLists();
         }
 
-        private void tvBlocks_AfterSelect(object sender, TreeViewEventArgs e)
+        private void TaskLoadThreadDetails(string blockName, IProgress<(string name, ListViewItem[] items, ThreadBlocks singleBlock)> progress)
         {
-            //change the list view to show the block
-            string blockName = e.Node!.Name;
-
-            //see if file or block, if file abort
-            if (blockName.Contains("_") == false) return;
-
-            //get the block
-            int blockIndex = int.Parse(blockName.Split("_")[1]);
             ThreadBlocks? singleBlock;
             if (Blocks.TryGetValue(blockName, out singleBlock) == false) return; //something went wrong
 
-            //update screen data
-            sslNodeID.Text = blockName;
-
-            //update data fields
-            sslFunc.Text = singleBlock.Func;
-            sslAction.Text = singleBlock.Action;
-            sslObjID.Text = singleBlock.objID;
-            sslPerformer.Text = singleBlock.Performer;
-
-            DateTime startTime = singleBlock.Parts!.First().timeStamp;
-            DateTime endTime = singleBlock.Parts!.Last().timeStamp;
-            var diff = endTime - startTime;
-            sslRuntime.Text = diff.ToString();
-
-            //if there are stats, enable button
-            cStats.Enabled = (singleBlock.stats != null);
-
-            //load the list
-            lstLines.SuspendLayout(); //many writes, so don't update with every add
-            lstLines.Items.Clear();
-
-            //this can take a LONG time to run, maybe move to task
+            ListViewItem[] items = [];
             DateTime diffFromPrevious = singleBlock.Parts![0].timeStamp;
             string[] filters = Settings.LoadFilters(Settings.FilterTypes.Logfilter); //preload filters
             foreach ((DateTime timeStamp, string level, string message) part in singleBlock.Parts!)
@@ -263,12 +234,60 @@ namespace OT_Performance_Tracer
                 //mark red if more than 10 seconds have passed
                 if ((part.timeStamp - diffFromPrevious).TotalSeconds > 10) singleLine.ForeColor = Color.Red;
                 diffFromPrevious = part.timeStamp;
-                lstLines.Items.Add(singleLine);
+                items = [.. items, singleLine];
             }
 
-            //finish up
-            lstLines.Columns[2].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lstLines.ResumeLayout();
+            //now call the progress to update the screen
+            progress.Report((blockName, items, singleBlock));
+        }
+
+
+        private void tvBlocks_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            //change the list view to show the block
+            string blockName = e.Node!.Name;
+
+            //see if file or block, if file abort
+            if (blockName.Contains("_") == false) return;
+
+            var progress = new Progress<(string name, ListViewItem[] items, ThreadBlocks singleBlock)>(value =>
+            {
+                //update the screen, if still the same blockName
+                if (value.name != blockName) return; //it doesn't - so dump it
+
+                //update screen data
+                sslNodeID.Text = blockName;
+
+                //update data fields
+                sslFunc.Text = value.singleBlock.Func;
+                sslAction.Text = value.singleBlock.Action;
+                sslObjID.Text = value.singleBlock.objID;
+                sslPerformer.Text =value. singleBlock.Performer;
+
+                //add runtime
+                DateTime startTime = value.singleBlock.Parts!.First().timeStamp;
+                DateTime endTime = value.singleBlock.Parts!.Last().timeStamp;
+                var diff = endTime - startTime;
+                sslRuntime.Text = diff.ToString();
+
+                //if there are stats, enable button
+                cStats.Enabled = (value.singleBlock.stats != null);
+
+                //load the list
+                lstLines.SuspendLayout(); //many writes, so don't update with every add
+                lstLines.Items.Clear();
+
+                //add the values provided
+                lstLines.Items.AddRange(value.items);
+
+                //finish up
+                lstLines.Columns[2].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+                lstLines.ResumeLayout();
+            });
+
+            _ = Task.Factory.StartNew(() => TaskLoadThreadDetails(blockName, progress));
+
+            return; 
         }
 
         private void UpdateTreeNode(string nodeName, TreeNode[] subNodes, int redCount)
