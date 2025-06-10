@@ -37,7 +37,13 @@ namespace OT_Performance_Tracer
                 var diff = endTime - startTime;
 
                 TreeNode singlePart = new();
-                singlePart.Text = $"{ThreadBlocks.BlockNames[block.Value.BlockType]} [{diff}] [{block.Value.Func}]";
+                string displayFunc = block.Value.Func!;
+                if (displayFunc == "ll")
+                {
+                    //append action, to get a bit more details, use ::
+                    displayFunc = $"{displayFunc}::{block.Value.Action}";
+                }
+                singlePart.Text = $"{ThreadBlocks.BlockNames[block.Value.BlockType]} [{diff}] [{displayFunc}]";
                 singlePart.Name = $"{FileName}_{block.Key}";
                 //set text color red if more than 10 seconds, unless startup, since that is very long
                 if (diff.TotalSeconds > 10 && block.Value.BlockType != ThreadBlocks.BlockTypes.Startup)
@@ -210,18 +216,13 @@ namespace OT_Performance_Tracer
 
         private void addToFiltersToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            fAddEditFilter form = new();
-            if (form.Add(lstLines.SelectedItems[0].SubItems[2].Text) == DialogResult.Cancel) return;
-
-            //add the filter and save
-            LogFilters.addFilter(form.FilterValue, LogFilters.FilterTypes.Logfilter);
-
-            //reload screen
+            doAddToLogFilter();
         }
 
         private void mLstContext_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             addToFiltersToolStripMenuItem.Enabled = (lstLines.SelectedItems.Count == 0 ? false : true);
+            openInWindowToolStripMenuItem.Enabled = (lstLines.SelectedItems.Count == 0 ? false : true);
         }
 
         private void openInWindowToolStripMenuItem_Click(object sender, EventArgs e)
@@ -273,9 +274,20 @@ namespace OT_Performance_Tracer
             openShowDetails();
         }
 
-        private void filterThreadFuncToolStripMenuItem_Click(object sender, EventArgs e)
+        private void doAddToLogFilter()
         {
-            if (tvBlocks.SelectedNode  == null) return;
+            fAddEditFilter form = new();
+            if (form.Add(lstLines.SelectedItems[0].SubItems[2].Text) == DialogResult.Cancel) return;
+
+            //add the filter and save
+            LogFilters.addFilter(form.FilterValue, LogFilters.FilterTypes.Logfilter);
+
+            //reload screen
+        }
+
+        private void doAddToThreadFilter()
+        {
+            if (tvBlocks.SelectedNode == null) return;
 
             //get the block
             int blockIndex = int.Parse(tvBlocks.SelectedNode.Name.Split("_")[1]);
@@ -283,10 +295,34 @@ namespace OT_Performance_Tracer
             if (Blocks.TryGetValue(tvBlocks.SelectedNode.Name, out singleBlock) == false) return; //something went wrong
 
             fAddEditFilter form = new();
-            if ( form.Add(singleBlock.Func!) == DialogResult.Cancel) return;
+            if (form.Add(singleBlock.Func!) == DialogResult.Cancel) return;
 
             //add the filter and save
             LogFilters.addFilter(form.FilterValue, LogFilters.FilterTypes.ThreadFilter);
+
+            //reload - missing
+        }
+
+        private void mTVContext_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            addToFiltersTVToolStripMenuItem.Enabled = (tvBlocks.SelectedNode == null ? false : true);
+        }
+
+        private void addSelectedToFilterToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            doAddToThreadFilter();
+        }
+
+        private void addToFiltersTVToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            doAddToThreadFilter();
+        }
+
+        private void showFiltersToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            fFilters f = new();
+
+            f.ShowList(LogFilters.FilterTypes.ThreadFilter);
         }
     }
 }
