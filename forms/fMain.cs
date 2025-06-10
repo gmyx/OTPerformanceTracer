@@ -68,7 +68,7 @@ namespace OT_Performance_Tracer
             if (sender == null) return;
 
             //sender is the individual item
-            //doLoadFolder(((ToolStripMenuItem)sender).Text!);
+            doLoadSinglefile(((ToolStripMenuItem)sender).Text!);
         }
 
         private void doLoadFolder(string folderToLoad)
@@ -131,10 +131,12 @@ namespace OT_Performance_Tracer
             });
             string ShortFileName = Path.GetFileNameWithoutExtension(filename);
 
+            //because we don't wipe the list, this could cause a duplicate to be created
+
             //create node
             TreeNode fileNode = tvBlocks.Nodes.Add(ShortFileName, ShortFileName);
 
-            _ = Task.Factory.StartNew(() => TaskLoadSingleFile(openThreadLogDialog.FileName, fileNode!, progress), TaskCreationOptions.LongRunning);
+            _ = Task.Factory.StartNew(() => TaskLoadSingleFile(filename, fileNode!, progress), TaskCreationOptions.LongRunning);
         }
 
         //this function probably belongs in seperate file
@@ -375,6 +377,7 @@ namespace OT_Performance_Tracer
         private void doAddToThreadFilter()
         {
             if (tvBlocks.SelectedNode == null) return;
+            if (tvBlocks.SelectedNode.Name.Contains("_") == false) return;
 
             //get the block
             int blockIndex = int.Parse(tvBlocks.SelectedNode.Name.Split("_")[1]);

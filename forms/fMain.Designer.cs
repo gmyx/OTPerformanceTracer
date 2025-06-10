@@ -36,6 +36,8 @@
             toolStripSeparator1 = new ToolStripSeparator();
             recentFolderMenuItem = new ToolStripMenuItem();
             recentFolderSampleItem = new ToolStripMenuItem();
+            recentFilesMenuItem = new ToolStripMenuItem();
+            recentFileSampleItem = new ToolStripMenuItem();
             filterToolStripMenuItem = new ToolStripMenuItem();
             logViewFiltersToolStripMenuItem = new ToolStripMenuItem();
             showFiltersToolStripMenuItem = new ToolStripMenuItem();
@@ -66,8 +68,6 @@
             ssGap = new ToolStripStatusLabel();
             ssProgress = new ToolStripProgressBar();
             folderLogBrowserDialog = new FolderBrowserDialog();
-            recentFilesMenuItem = new ToolStripMenuItem();
-            recentFileSampleItem = new ToolStripMenuItem();
             mMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -127,6 +127,20 @@
             recentFolderSampleItem.Name = "recentFolderSampleItem";
             recentFolderSampleItem.Size = new Size(180, 22);
             recentFolderSampleItem.Text = "None";
+            // 
+            // recentFilesMenuItem
+            // 
+            recentFilesMenuItem.DropDownItems.AddRange(new ToolStripItem[] { recentFileSampleItem });
+            recentFilesMenuItem.Name = "recentFilesMenuItem";
+            recentFilesMenuItem.Size = new Size(180, 22);
+            recentFilesMenuItem.Text = "Recent Files";
+            // 
+            // recentFileSampleItem
+            // 
+            recentFileSampleItem.Enabled = false;
+            recentFileSampleItem.Name = "recentFileSampleItem";
+            recentFileSampleItem.Size = new Size(180, 22);
+            recentFileSampleItem.Text = "None";
             // 
             // filterToolStripMenuItem
             // 
@@ -347,20 +361,6 @@
             // folderLogBrowserDialog
             // 
             folderLogBrowserDialog.ShowNewFolderButton = false;
-            // 
-            // recentFilesMenuItem
-            // 
-            recentFilesMenuItem.DropDownItems.AddRange(new ToolStripItem[] { recentFileSampleItem });
-            recentFilesMenuItem.Name = "recentFilesMenuItem";
-            recentFilesMenuItem.Size = new Size(180, 22);
-            recentFilesMenuItem.Text = "Recent Files";
-            // 
-            // recentFileSampleItem
-            // 
-            recentFileSampleItem.Enabled = false;
-            recentFileSampleItem.Name = "recentFileSampleItem";
-            recentFileSampleItem.Size = new Size(180, 22);
-            recentFileSampleItem.Text = "None";
             // 
             // fMain
             // 
