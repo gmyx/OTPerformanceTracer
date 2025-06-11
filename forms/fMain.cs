@@ -1,4 +1,5 @@
 using OT_Performance_Tracer.classes;
+using OT_Performance_Tracer.forms;
 using System.Windows.Forms.VisualStyles;
 
 namespace OT_Performance_Tracer
@@ -9,9 +10,15 @@ namespace OT_Performance_Tracer
         {
             InitializeComponent();
             LoadRecentItemsLists();
+
+            //register search events
+            SearchForm.SearchFirst += SearchFirst;
+            SearchForm.SearchNext += SearchNext;
         }
 
         private Dictionary<string, ThreadBlocks> Blocks = [];
+        private readonly fSearch SearchForm = new();
+        private int currentSearchIndex = 0;
 
         private void loadFoldersFromRecent()
         {
@@ -52,10 +59,10 @@ namespace OT_Performance_Tracer
         private void LoadRecentItemsLists()
         {
             loadFoldersFromRecent();
-            LoadFilesFromRecent();        
+            LoadFilesFromRecent();
         }
 
-        private void loadFolder(object sender, EventArgs e)
+        private void loadFolder(object? sender, EventArgs e)
         {
             if (sender == null) return;
 
@@ -63,7 +70,7 @@ namespace OT_Performance_Tracer
             doLoadFolder(((ToolStripMenuItem)sender).Text!);
         }
 
-        private void loadFile(object sender, EventArgs e)
+        private void loadFile(object? sender, EventArgs e)
         {
             if (sender == null) return;
 
@@ -262,7 +269,7 @@ namespace OT_Performance_Tracer
                 sslFunc.Text = value.singleBlock.Func;
                 sslAction.Text = value.singleBlock.Action;
                 sslObjID.Text = value.singleBlock.objID;
-                sslPerformer.Text =value. singleBlock.Performer;
+                sslPerformer.Text = value.singleBlock.Performer;
 
                 //add runtime
                 DateTime startTime = value.singleBlock.Parts!.First().timeStamp;
@@ -287,7 +294,7 @@ namespace OT_Performance_Tracer
 
             _ = Task.Factory.StartNew(() => TaskLoadThreadDetails(blockName, progress));
 
-            return; 
+            return;
         }
 
         private void UpdateTreeNode(string nodeName, TreeNode[] subNodes, int redCount)
@@ -434,6 +441,56 @@ namespace OT_Performance_Tracer
             fFilters f = new();
 
             f.ShowList(Settings.FilterTypes.ThreadFilter);
+        }
+
+        private void singleThreadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tvBlocks.SelectedNode == null) return;
+
+            //create a global search form, and register some events there to navigate
+            SearchForm.Show();
+        }
+
+        private void SearchList(int startIndex)
+        {
+            //if startIndex is longer than list, start at 0
+            if (startIndex> lstLines.Items.Count)
+            {
+                startIndex = 0; //fail safe
+            }
+
+            //look only at the selected thread, so basicly the list view
+            ListViewItem? foundItem = lstLines.FindItemWithText(SearchForm.SearchString, true, startIndex);
+
+            if (foundItem == null && startIndex != 0)
+            {
+                //loop around and try again
+                foundItem = lstLines.FindItemWithText(SearchForm.SearchString, true, 0);
+            }
+
+            //see if got a hit
+            if (foundItem == null)
+            {
+                MessageBox.Show("Item not found!", "Not found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            //go to that item
+            foundItem.Selected = true;
+            foundItem.EnsureVisible();
+
+            //save current pointer
+            currentSearchIndex = foundItem.Index + 1;
+        }
+
+        private void SearchFirst(object? sender, EventArgs e)
+        {
+            SearchList(0); // 0 being the first item in the list
+        }
+
+        private void SearchNext(object? sender, EventArgs e)
+        {
+            SearchList(currentSearchIndex); //from previous search
         }
     }
 }
