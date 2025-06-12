@@ -102,48 +102,48 @@
             // loadFolderToolStripMenuItem
             // 
             loadFolderToolStripMenuItem.Name = "loadFolderToolStripMenuItem";
-            loadFolderToolStripMenuItem.Size = new Size(180, 22);
+            loadFolderToolStripMenuItem.Size = new Size(158, 22);
             loadFolderToolStripMenuItem.Text = "Load Folder";
             loadFolderToolStripMenuItem.Click += loadFolderToolStripMenuItem_Click;
             // 
             // loadThreadLogToolStripMenuItem
             // 
             loadThreadLogToolStripMenuItem.Name = "loadThreadLogToolStripMenuItem";
-            loadThreadLogToolStripMenuItem.Size = new Size(180, 22);
+            loadThreadLogToolStripMenuItem.Size = new Size(158, 22);
             loadThreadLogToolStripMenuItem.Text = "Load Single Log";
             loadThreadLogToolStripMenuItem.Click += loadThreadLogToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(177, 6);
+            toolStripSeparator1.Size = new Size(155, 6);
             // 
             // recentFolderMenuItem
             // 
             recentFolderMenuItem.DropDownItems.AddRange(new ToolStripItem[] { recentFolderSampleItem });
             recentFolderMenuItem.Name = "recentFolderMenuItem";
-            recentFolderMenuItem.Size = new Size(180, 22);
+            recentFolderMenuItem.Size = new Size(158, 22);
             recentFolderMenuItem.Text = "Recent Folder";
             // 
             // recentFolderSampleItem
             // 
             recentFolderSampleItem.Enabled = false;
             recentFolderSampleItem.Name = "recentFolderSampleItem";
-            recentFolderSampleItem.Size = new Size(180, 22);
+            recentFolderSampleItem.Size = new Size(103, 22);
             recentFolderSampleItem.Text = "None";
             // 
             // recentFilesMenuItem
             // 
             recentFilesMenuItem.DropDownItems.AddRange(new ToolStripItem[] { recentFileSampleItem });
             recentFilesMenuItem.Name = "recentFilesMenuItem";
-            recentFilesMenuItem.Size = new Size(180, 22);
+            recentFilesMenuItem.Size = new Size(158, 22);
             recentFilesMenuItem.Text = "Recent Files";
             // 
             // recentFileSampleItem
             // 
             recentFileSampleItem.Enabled = false;
             recentFileSampleItem.Name = "recentFileSampleItem";
-            recentFileSampleItem.Size = new Size(180, 22);
+            recentFileSampleItem.Size = new Size(103, 22);
             recentFileSampleItem.Text = "None";
             // 
             // filterToolStripMenuItem
@@ -157,7 +157,7 @@
             // 
             logViewFiltersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showFiltersToolStripMenuItem, addSelectedToFilterToolStripMenuItem });
             logViewFiltersToolStripMenuItem.Name = "logViewFiltersToolStripMenuItem";
-            logViewFiltersToolStripMenuItem.Size = new Size(180, 22);
+            logViewFiltersToolStripMenuItem.Size = new Size(166, 22);
             logViewFiltersToolStripMenuItem.Text = "Log View Filters";
             // 
             // showFiltersToolStripMenuItem
@@ -177,7 +177,7 @@
             // 
             threadListFiltersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showFiltersToolStripMenuItem1, addSelectedToFilterToolStripMenuItem1 });
             threadListFiltersToolStripMenuItem.Name = "threadListFiltersToolStripMenuItem";
-            threadListFiltersToolStripMenuItem.Size = new Size(180, 22);
+            threadListFiltersToolStripMenuItem.Size = new Size(166, 22);
             threadListFiltersToolStripMenuItem.Text = "Thread List Filters";
             // 
             // showFiltersToolStripMenuItem1
@@ -204,20 +204,21 @@
             // singleThreadToolStripMenuItem
             // 
             singleThreadToolStripMenuItem.Name = "singleThreadToolStripMenuItem";
-            singleThreadToolStripMenuItem.Size = new Size(180, 22);
+            singleThreadToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.F;
+            singleThreadToolStripMenuItem.Size = new Size(186, 22);
             singleThreadToolStripMenuItem.Text = "Single Thread";
             singleThreadToolStripMenuItem.Click += singleThreadToolStripMenuItem_Click;
             // 
             // singleFileToolStripMenuItem
             // 
             singleFileToolStripMenuItem.Name = "singleFileToolStripMenuItem";
-            singleFileToolStripMenuItem.Size = new Size(180, 22);
+            singleFileToolStripMenuItem.Size = new Size(186, 22);
             singleFileToolStripMenuItem.Text = "Single File";
             // 
             // allOpenedFilesToolStripMenuItem
             // 
             allOpenedFilesToolStripMenuItem.Name = "allOpenedFilesToolStripMenuItem";
-            allOpenedFilesToolStripMenuItem.Size = new Size(180, 22);
+            allOpenedFilesToolStripMenuItem.Size = new Size(186, 22);
             allOpenedFilesToolStripMenuItem.Text = "All Opened Files";
             // 
             // openThreadLogDialog

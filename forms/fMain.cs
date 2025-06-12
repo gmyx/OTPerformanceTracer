@@ -248,7 +248,6 @@ namespace OT_Performance_Tracer
             progress.Report((blockName, items, singleBlock));
         }
 
-
         private void tvBlocks_AfterSelect(object sender, TreeViewEventArgs e)
         {
             //change the list view to show the block
@@ -454,33 +453,59 @@ namespace OT_Performance_Tracer
         private void SearchList(int startIndex)
         {
             //if startIndex is longer than list, start at 0
-            if (startIndex> lstLines.Items.Count)
+            if (startIndex > lstLines.Items.Count)
             {
                 startIndex = 0; //fail safe
             }
 
-            //look only at the selected thread, so basicly the list view
-            ListViewItem? foundItem = lstLines.FindItemWithText(SearchForm.SearchString, true, startIndex);
-
-            if (foundItem == null && startIndex != 0)
-            {
-                //loop around and try again
-                foundItem = lstLines.FindItemWithText(SearchForm.SearchString, true, 0);
-            }
+            //FindItemWithText looks only at the start of a string, so have to do a custom search
+            var items = lstLines.Items.Cast<ListViewItem>()
+                .Where(x => (
+                    x.Text.Contains(SearchForm.SearchString, StringComparison.InvariantCultureIgnoreCase) ||
+                    x.SubItems[2].Text.Contains(SearchForm.SearchString, StringComparison.InvariantCultureIgnoreCase)));
 
             //see if got a hit
-            if (foundItem == null)
+            if (items.Count() == 0)
             {
                 MessageBox.Show("Item not found!", "Not found", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            //go to that item
-            foundItem.Selected = true;
-            foundItem.EnsureVisible();
+            if (startIndex == 0)
+            {
+                //just go to the first
+                items.First().Selected = true;
+                items.First().EnsureVisible();
+
+                //save current pointer
+                currentSearchIndex = items.First().Index;
+
+                return;
+            }
+
+            //go the the first item that is beyond current index
+            foreach (var singleItem in items)
+            {
+                if (singleItem.Index > currentSearchIndex)
+                {
+                    singleItem.Selected = true;
+                    singleItem.EnsureVisible();
+
+                    //save current pointer
+                    currentSearchIndex = items.First().Index;
+
+                    return;
+                }
+            }
+
+            //if we got here, we had a start index over 0 but were at end of list, go to first line instead
+            items.First().Selected = true;
+            items.First().EnsureVisible();
 
             //save current pointer
-            currentSearchIndex = foundItem.Index + 1;
+            currentSearchIndex = items.First().Index;
+
+            return;
         }
 
         private void SearchFirst(object? sender, EventArgs e)

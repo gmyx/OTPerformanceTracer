@@ -31,6 +31,8 @@
             txtSearchString = new TextBox();
             cFirst = new Button();
             cNext = new Button();
+            label1 = new Label();
+            cScope = new ComboBox();
             SuspendLayout();
             // 
             // txtSearchString
@@ -45,7 +47,7 @@
             cFirst.Location = new Point(508, 46);
             cFirst.Name = "cFirst";
             cFirst.Size = new Size(75, 23);
-            cFirst.TabIndex = 1;
+            cFirst.TabIndex = 3;
             cFirst.Text = "First";
             cFirst.UseVisualStyleBackColor = true;
             cFirst.Click += cFirst_Click;
@@ -55,10 +57,28 @@
             cNext.Location = new Point(589, 45);
             cNext.Name = "cNext";
             cNext.Size = new Size(75, 23);
-            cNext.TabIndex = 2;
+            cNext.TabIndex = 4;
             cNext.Text = "Next";
             cNext.UseVisualStyleBackColor = true;
             cNext.Click += cNext_Click;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 50);
+            label1.Name = "label1";
+            label1.Size = new Size(39, 15);
+            label1.TabIndex = 1;
+            label1.Text = "Scope";
+            // 
+            // cScope
+            // 
+            cScope.FormattingEnabled = true;
+            cScope.Items.AddRange(new object[] { "Current Request", "Current Thread file", "All Files" });
+            cScope.Location = new Point(57, 46);
+            cScope.Name = "cScope";
+            cScope.Size = new Size(145, 23);
+            cScope.TabIndex = 2;
             // 
             // fSearch
             // 
@@ -66,6 +86,8 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(676, 81);
+            Controls.Add(cScope);
+            Controls.Add(label1);
             Controls.Add(cNext);
             Controls.Add(cFirst);
             Controls.Add(txtSearchString);
@@ -84,5 +106,7 @@
         private TextBox txtSearchString;
         private Button cFirst;
         private Button cNext;
+        private Label label1;
+        private ComboBox cScope;
     }
 }
