@@ -9,8 +9,7 @@
 
         public DialogResult buttonPressed = DialogResult.Cancel;
 
-        public string FilterValue
-        { get { return txtFilter.Text; } }
+        public string FilterValue => txtFilter.Text;
 
         public DialogResult Add(string suggested = "")
         {

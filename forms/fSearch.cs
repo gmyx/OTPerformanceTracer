@@ -15,10 +15,28 @@ namespace OT_Performance_Tracer.forms
         public fSearch()
         {
             InitializeComponent();
+
+            //cScope.Items.Add(fSearch.Allfiles);
+
+            //populate the dropdown
+            foreach (Scope scope in Enum.GetValues<Scope>())
+            {
+                string? item = fSearch.ResourceManager.GetString(scope.ToString());
+
+                if (item != null) cScope.Items.Add(item);
+            }
         }
 
         public event EventHandler? SearchFirst;
+
         public event EventHandler? SearchNext;
+
+        public enum Scope
+        {
+            SingleThread,
+            SingleFile,
+            AllFiles
+        }
 
         private void cFirst_Click(object sender, EventArgs e)
         {
@@ -40,9 +58,25 @@ namespace OT_Performance_Tracer.forms
             }
         }
 
-        public string SearchString
+        public string SearchString => txtSearchString.Text;
+
+        public Scope? SelectedScope
         {
-            get { return txtSearchString.Text; }
+            get
+            {
+                //derefrence the dromdown
+                foreach (Scope scope in Enum.GetValues<Scope>())
+                {
+                    string? item = fSearch.ResourceManager.GetString(scope.ToString());
+
+                    if (cScope.Text == item)
+                    {
+                        return scope;
+                    }
+                }
+
+                return null;
+            }
         }
     }
 }
