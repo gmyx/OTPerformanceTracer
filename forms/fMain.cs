@@ -452,17 +452,33 @@ namespace OT_Performance_Tracer
 
         private void SearchList(int startIndex)
         {
-            //if startIndex is longer than list, start at 0
-            if (startIndex > lstLines.Items.Count)
+            if (tvBlocks.SelectedNode == null) return;
+            if (tvBlocks.SelectedNode.Name.Contains("_") == false) return;
+
+            //get the block
+            int blockIndex = int.Parse(tvBlocks.SelectedNode.Name.Split("_")[1]);
+            ThreadBlocks? currentBlock;
+            if (Blocks.TryGetValue(tvBlocks.SelectedNode.Name, out currentBlock) == false) return; //something went wrong
+
+            //if startIndex is longer than list, start at 0 - or current index is 0
+            if (startIndex > currentBlock.Parts!.Count || currentSearchIndex == 0)// lstLines.Items.Count)
             {
                 startIndex = 0; //fail safe
             }
+            else if (startIndex == 0)
+            {
+                currentSearchIndex = 0; //reset current pointer
+            }
 
             //FindItemWithText looks only at the start of a string, so have to do a custom search
-            var items = lstLines.Items.Cast<ListViewItem>()
+            var items = currentBlock.Parts.Cast<(DateTime timeStamp, string level, string message)>()
+                .Where(x => (
+                    x.message.Contains(SearchForm.SearchString, StringComparison.InvariantCultureIgnoreCase)
+                ));
+            /*var items = lstLines.Items.Cast<ListViewItem>()
                 .Where(x => (
                     x.Text.Contains(SearchForm.SearchString, StringComparison.InvariantCultureIgnoreCase) ||
-                    x.SubItems[2].Text.Contains(SearchForm.SearchString, StringComparison.InvariantCultureIgnoreCase)));
+                    x.SubItems[2].Text.Contains(SearchForm.SearchString, StringComparison.InvariantCultureIgnoreCase)));*/
 
             //see if got a hit
             if (items.Count() == 0)
@@ -471,39 +487,32 @@ namespace OT_Performance_Tracer
                 return;
             }
 
-            if (startIndex == 0)
-            {
-                //just go to the first
-                items.First().Selected = true;
-                items.First().EnsureVisible();
-
-                //save current pointer
-                currentSearchIndex = items.First().Index;
-
-                return;
-            }
-
             //go the the first item that is beyond current index
+            int itemIndex;
             foreach (var singleItem in items)
             {
-                if (singleItem.Index > currentSearchIndex)
+                itemIndex = currentBlock.Parts.IndexOf(singleItem);
+                if (itemIndex > currentSearchIndex) //this is the nxt one in line
                 {
-                    singleItem.Selected = true;
-                    singleItem.EnsureVisible();
+                    lstLines.SelectedItems.Clear(); //ensure nothing else is selected
+                    lstLines.Items[itemIndex].Selected = true;
+                    lstLines.Items[itemIndex].EnsureVisible();
 
                     //save current pointer
-                    currentSearchIndex = items.First().Index;
+                    currentSearchIndex = itemIndex;
 
                     return;
                 }
             }
 
-            //if we got here, we had a start index over 0 but were at end of list, go to first line instead
-            items.First().Selected = true;
-            items.First().EnsureVisible();
+            //if we got here, we had a start index over 0 but were at end of list, go to first result instead
+            itemIndex = currentBlock.Parts.IndexOf(items.First());
+            lstLines.SelectedItems.Clear(); //ensure nothing else is selected
+            lstLines.Items[itemIndex].Selected = true;
+            lstLines.Items[itemIndex].EnsureVisible();
 
             //save current pointer
-            currentSearchIndex = items.First().Index;
+            currentSearchIndex = itemIndex; //items.First().Index;
 
             return;
         }
