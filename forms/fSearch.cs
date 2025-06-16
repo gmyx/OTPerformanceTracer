@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,12 +17,10 @@ namespace OT_Performance_Tracer.forms
         {
             InitializeComponent();
 
-            //cScope.Items.Add(fSearch.Allfiles);
-
-            //populate the dropdown
+            //populate the dropdown(
             foreach (Scope scope in Enum.GetValues<Scope>())
             {
-                string? item = fSearch.ResourceManager.GetString(scope.ToString());
+                string? item = ResourceManager.GetString(scope.ToString());
 
                 if (item != null) cScope.Items.Add(item);
             }
@@ -31,6 +30,21 @@ namespace OT_Performance_Tracer.forms
 
         public event EventHandler? SearchNext;
 
+        private ResourceManager resourceMan;
+
+        internal ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("OT_Performance_Tracer.forms.fSearch", typeof(fSearch).Assembly);
+                    resourceMan = temp;
+                }
+                return resourceMan;
+            }
+        }
+
         public enum Scope
         {
             SingleThread,
@@ -38,8 +52,28 @@ namespace OT_Performance_Tracer.forms
             AllFiles
         }
 
+        public void ShowSearch(Scope scope)
+        {
+            switch (txtSearchString.Text)
+            {
+                case "":
+                    this.AcceptButton = cFirst;
+                    break;
+
+                default:
+                    this.AcceptButton = cNext;
+                    break;
+            }
+
+            this.SelectedScope = scope;
+            this.Show();
+        }
+
         private void cFirst_Click(object sender, EventArgs e)
         {
+            //this.TransparencyKey = System.Drawing.SystemColors.Control;
+            //this.Opacity = 50;
+            if (txtSearchString.Text != "") { this.AcceptButton = cNext; }
             SearchFirst?.Invoke(this, EventArgs.Empty);
         }
 
@@ -67,7 +101,7 @@ namespace OT_Performance_Tracer.forms
                 //derefrence the dromdown
                 foreach (Scope scope in Enum.GetValues<Scope>())
                 {
-                    string? item = fSearch.ResourceManager.GetString(scope.ToString());
+                    string? item = ResourceManager.GetString(scope.ToString());
 
                     if (cScope.Text == item)
                     {
@@ -76,6 +110,11 @@ namespace OT_Performance_Tracer.forms
                 }
 
                 return null;
+            }
+            set
+            {
+                // derefrence the dromdown
+                cScope.Text = ResourceManager.GetString(value.ToString());
             }
         }
     }

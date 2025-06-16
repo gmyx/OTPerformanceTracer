@@ -447,7 +447,7 @@ namespace OT_Performance_Tracer
             if (tvBlocks.SelectedNode == null) return;
 
             //create a global search form, and register some events there to navigate
-            SearchForm.Show();
+            SearchForm.ShowSearch(fSearch.Scope.SingleThread);
         }
 
         private void SearchList(int startIndex)
