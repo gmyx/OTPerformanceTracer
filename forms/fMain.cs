@@ -450,15 +450,15 @@ namespace OT_Performance_Tracer
             SearchForm.ShowSearch(fSearch.Scope.SingleThread);
         }
 
-        private void SearchList(int startIndex)
+        private bool SearchList(int startIndex, bool SuppressMessage = false)
         {
-            if (tvBlocks.SelectedNode == null) return;
-            if (tvBlocks.SelectedNode.Name.Contains("_") == false) return;
+            if (tvBlocks.SelectedNode == null) return false;
+            if (tvBlocks.SelectedNode.Name.Contains("_") == false) return false;
 
             //get the block
             int blockIndex = int.Parse(tvBlocks.SelectedNode.Name.Split("_")[1]);
             ThreadBlocks? currentBlock;
-            if (Blocks.TryGetValue(tvBlocks.SelectedNode.Name, out currentBlock) == false) return; //something went wrong
+            if (Blocks.TryGetValue(tvBlocks.SelectedNode.Name, out currentBlock) == false) return false; //something went wrong
 
             //if startIndex is longer than list, start at 0 - or current index is 0
             if (startIndex > currentBlock.Parts!.Count || currentSearchIndex == 0)// lstLines.Items.Count)
@@ -475,16 +475,16 @@ namespace OT_Performance_Tracer
                 .Where(x => (
                     x.message.Contains(SearchForm.SearchString, StringComparison.InvariantCultureIgnoreCase)
                 ));
-            /*var items = lstLines.Items.Cast<ListViewItem>()
-                .Where(x => (
-                    x.Text.Contains(SearchForm.SearchString, StringComparison.InvariantCultureIgnoreCase) ||
-                    x.SubItems[2].Text.Contains(SearchForm.SearchString, StringComparison.InvariantCultureIgnoreCase)));*/
 
             //see if got a hit
             if (items.Count() == 0)
             {
-                MessageBox.Show("Item not found!", "Not found", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (SuppressMessage == false)
+                {
+                    MessageBox.Show("Item not found!", "Not found", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                return false;
             }
 
             //go the the first item that is beyond current index
@@ -501,9 +501,11 @@ namespace OT_Performance_Tracer
                     //save current pointer
                     currentSearchIndex = itemIndex;
 
-                    return;
+                    return true;
                 }
             }
+
+            return false;
 
             //if we got here, we had a start index over 0 but were at end of list, go to first result instead
             itemIndex = currentBlock.Parts.IndexOf(items.First());
@@ -514,17 +516,31 @@ namespace OT_Performance_Tracer
             //save current pointer
             currentSearchIndex = itemIndex; //items.First().Index;
 
-            return;
+            return true;
+        }
+
+        private void SelectSearchFromScope(int index, fSearch.Scope? scope)
+        {
+            switch (scope)
+            {
+                case fSearch.Scope.SingleThread:
+                    //do a search and see if there is a result
+                    if (SearchList(index, true) == false)
+                    {
+                        SearchList(0); //try again at 0, then abort
+                    }
+                    break;
+            }
         }
 
         private void SearchFirst(object? sender, EventArgs e)
         {
-            SearchList(0); // 0 being the first item in the list
+            SelectSearchFromScope(0, SearchForm.SelectedScope); // 0 being the first item in the list
         }
 
         private void SearchNext(object? sender, EventArgs e)
         {
-            SearchList(currentSearchIndex); //from previous search
+            SelectSearchFromScope(currentSearchIndex, SearchForm.SelectedScope); //from previous search
         }
     }
 }
