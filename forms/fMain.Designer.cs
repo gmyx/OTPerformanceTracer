@@ -38,6 +38,11 @@
             recentFolderSampleItem = new ToolStripMenuItem();
             recentFilesMenuItem = new ToolStripMenuItem();
             recentFileSampleItem = new ToolStripMenuItem();
+            toolStripMenuItem1 = new ToolStripMenuItem();
+            singleThreadToolStripMenuItem = new ToolStripMenuItem();
+            singleFileToolStripMenuItem = new ToolStripMenuItem();
+            allOpenedFilesToolStripMenuItem = new ToolStripMenuItem();
+            settingsToolStripMenuItem = new ToolStripMenuItem();
             filterToolStripMenuItem = new ToolStripMenuItem();
             logViewFiltersToolStripMenuItem = new ToolStripMenuItem();
             showFiltersToolStripMenuItem = new ToolStripMenuItem();
@@ -45,10 +50,7 @@
             threadListFiltersToolStripMenuItem = new ToolStripMenuItem();
             showFiltersToolStripMenuItem1 = new ToolStripMenuItem();
             addSelectedToFilterToolStripMenuItem1 = new ToolStripMenuItem();
-            toolStripMenuItem1 = new ToolStripMenuItem();
-            singleThreadToolStripMenuItem = new ToolStripMenuItem();
-            singleFileToolStripMenuItem = new ToolStripMenuItem();
-            allOpenedFilesToolStripMenuItem = new ToolStripMenuItem();
+            highLigthToolStripMenuItem = new ToolStripMenuItem();
             openThreadLogDialog = new OpenFileDialog();
             splitContainer1 = new SplitContainer();
             tvBlocks = new TreeView();
@@ -85,7 +87,7 @@
             // mMenu
             // 
             mMenu.ImageScalingSize = new Size(36, 36);
-            mMenu.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, filterToolStripMenuItem, toolStripMenuItem1 });
+            mMenu.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, toolStripMenuItem1, settingsToolStripMenuItem });
             mMenu.Location = new Point(0, 0);
             mMenu.Name = "mMenu";
             mMenu.Size = new Size(1129, 24);
@@ -146,54 +148,6 @@
             recentFileSampleItem.Size = new Size(103, 22);
             recentFileSampleItem.Text = "None";
             // 
-            // filterToolStripMenuItem
-            // 
-            filterToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { logViewFiltersToolStripMenuItem, threadListFiltersToolStripMenuItem });
-            filterToolStripMenuItem.Name = "filterToolStripMenuItem";
-            filterToolStripMenuItem.Size = new Size(45, 20);
-            filterToolStripMenuItem.Text = "Filter";
-            // 
-            // logViewFiltersToolStripMenuItem
-            // 
-            logViewFiltersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showFiltersToolStripMenuItem, addSelectedToFilterToolStripMenuItem });
-            logViewFiltersToolStripMenuItem.Name = "logViewFiltersToolStripMenuItem";
-            logViewFiltersToolStripMenuItem.Size = new Size(166, 22);
-            logViewFiltersToolStripMenuItem.Text = "Log View Filters";
-            // 
-            // showFiltersToolStripMenuItem
-            // 
-            showFiltersToolStripMenuItem.Name = "showFiltersToolStripMenuItem";
-            showFiltersToolStripMenuItem.Size = new Size(186, 22);
-            showFiltersToolStripMenuItem.Text = "Show Filters";
-            showFiltersToolStripMenuItem.Click += showFiltersToolStripMenuItem_Click;
-            // 
-            // addSelectedToFilterToolStripMenuItem
-            // 
-            addSelectedToFilterToolStripMenuItem.Name = "addSelectedToFilterToolStripMenuItem";
-            addSelectedToFilterToolStripMenuItem.Size = new Size(186, 22);
-            addSelectedToFilterToolStripMenuItem.Text = "Add Selected to Filter";
-            // 
-            // threadListFiltersToolStripMenuItem
-            // 
-            threadListFiltersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showFiltersToolStripMenuItem1, addSelectedToFilterToolStripMenuItem1 });
-            threadListFiltersToolStripMenuItem.Name = "threadListFiltersToolStripMenuItem";
-            threadListFiltersToolStripMenuItem.Size = new Size(166, 22);
-            threadListFiltersToolStripMenuItem.Text = "Thread List Filters";
-            // 
-            // showFiltersToolStripMenuItem1
-            // 
-            showFiltersToolStripMenuItem1.Name = "showFiltersToolStripMenuItem1";
-            showFiltersToolStripMenuItem1.Size = new Size(186, 22);
-            showFiltersToolStripMenuItem1.Text = "Show Filters";
-            showFiltersToolStripMenuItem1.Click += showFiltersToolStripMenuItem1_Click;
-            // 
-            // addSelectedToFilterToolStripMenuItem1
-            // 
-            addSelectedToFilterToolStripMenuItem1.Name = "addSelectedToFilterToolStripMenuItem1";
-            addSelectedToFilterToolStripMenuItem1.Size = new Size(186, 22);
-            addSelectedToFilterToolStripMenuItem1.Text = "Add Selected to Filter";
-            addSelectedToFilterToolStripMenuItem1.Click += addSelectedToFilterToolStripMenuItem1_Click;
-            // 
             // toolStripMenuItem1
             // 
             toolStripMenuItem1.DropDownItems.AddRange(new ToolStripItem[] { singleThreadToolStripMenuItem, singleFileToolStripMenuItem, allOpenedFilesToolStripMenuItem });
@@ -220,6 +174,65 @@
             allOpenedFilesToolStripMenuItem.Name = "allOpenedFilesToolStripMenuItem";
             allOpenedFilesToolStripMenuItem.Size = new Size(186, 22);
             allOpenedFilesToolStripMenuItem.Text = "All Opened Files";
+            // 
+            // settingsToolStripMenuItem
+            // 
+            settingsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { filterToolStripMenuItem, highLigthToolStripMenuItem });
+            settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            settingsToolStripMenuItem.Size = new Size(61, 20);
+            settingsToolStripMenuItem.Text = "Settings";
+            // 
+            // filterToolStripMenuItem
+            // 
+            filterToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { logViewFiltersToolStripMenuItem, threadListFiltersToolStripMenuItem });
+            filterToolStripMenuItem.Name = "filterToolStripMenuItem";
+            filterToolStripMenuItem.Size = new Size(180, 22);
+            filterToolStripMenuItem.Text = "Filter";
+            // 
+            // logViewFiltersToolStripMenuItem
+            // 
+            logViewFiltersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showFiltersToolStripMenuItem, addSelectedToFilterToolStripMenuItem });
+            logViewFiltersToolStripMenuItem.Name = "logViewFiltersToolStripMenuItem";
+            logViewFiltersToolStripMenuItem.Size = new Size(180, 22);
+            logViewFiltersToolStripMenuItem.Text = "Log View Filters";
+            // 
+            // showFiltersToolStripMenuItem
+            // 
+            showFiltersToolStripMenuItem.Name = "showFiltersToolStripMenuItem";
+            showFiltersToolStripMenuItem.Size = new Size(186, 22);
+            showFiltersToolStripMenuItem.Text = "Show Filters";
+            // 
+            // addSelectedToFilterToolStripMenuItem
+            // 
+            addSelectedToFilterToolStripMenuItem.Name = "addSelectedToFilterToolStripMenuItem";
+            addSelectedToFilterToolStripMenuItem.Size = new Size(186, 22);
+            addSelectedToFilterToolStripMenuItem.Text = "Add Selected to Filter";
+            // 
+            // threadListFiltersToolStripMenuItem
+            // 
+            threadListFiltersToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { showFiltersToolStripMenuItem1, addSelectedToFilterToolStripMenuItem1 });
+            threadListFiltersToolStripMenuItem.Name = "threadListFiltersToolStripMenuItem";
+            threadListFiltersToolStripMenuItem.Size = new Size(180, 22);
+            threadListFiltersToolStripMenuItem.Text = "Thread List Filters";
+            // 
+            // showFiltersToolStripMenuItem1
+            // 
+            showFiltersToolStripMenuItem1.Name = "showFiltersToolStripMenuItem1";
+            showFiltersToolStripMenuItem1.Size = new Size(186, 22);
+            showFiltersToolStripMenuItem1.Text = "Show Filters";
+            // 
+            // addSelectedToFilterToolStripMenuItem1
+            // 
+            addSelectedToFilterToolStripMenuItem1.Name = "addSelectedToFilterToolStripMenuItem1";
+            addSelectedToFilterToolStripMenuItem1.Size = new Size(186, 22);
+            addSelectedToFilterToolStripMenuItem1.Text = "Add Selected to Filter";
+            // 
+            // highLigthToolStripMenuItem
+            // 
+            highLigthToolStripMenuItem.Name = "highLigthToolStripMenuItem";
+            highLigthToolStripMenuItem.Size = new Size(180, 22);
+            highLigthToolStripMenuItem.Text = "Highlights";
+            highLigthToolStripMenuItem.Click += highLigthToolStripMenuItem_Click;
             // 
             // openThreadLogDialog
             // 
@@ -436,7 +449,6 @@
         private ToolStripStatusLabel sslObjID;
         private ToolStripStatusLabel sslPerformer;
         private ToolStripStatusLabel sslRuntime;
-        private ToolStripMenuItem filterToolStripMenuItem;
         private ToolStripMenuItem loadFolderToolStripMenuItem;
         private FolderBrowserDialog folderLogBrowserDialog;
         private ContextMenuStrip mLstContext;
@@ -445,14 +457,8 @@
         private ToolStripStatusLabel ssGap;
         private ToolStripMenuItem openInWindowToolStripMenuItem;
         private ColumnHeader chLevel;
-        private ToolStripMenuItem logViewFiltersToolStripMenuItem;
-        private ToolStripMenuItem showFiltersToolStripMenuItem;
-        private ToolStripMenuItem threadListFiltersToolStripMenuItem;
         private ContextMenuStrip mTVContext;
         private ToolStripMenuItem addToFiltersTVToolStripMenuItem;
-        private ToolStripMenuItem addSelectedToFilterToolStripMenuItem;
-        private ToolStripMenuItem showFiltersToolStripMenuItem1;
-        private ToolStripMenuItem addSelectedToFilterToolStripMenuItem1;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem recentFolderMenuItem;
         private ToolStripMenuItem recentFolderSampleItem;
@@ -462,5 +468,14 @@
         private ToolStripMenuItem singleThreadToolStripMenuItem;
         private ToolStripMenuItem singleFileToolStripMenuItem;
         private ToolStripMenuItem allOpenedFilesToolStripMenuItem;
+        private ToolStripMenuItem settingsToolStripMenuItem;
+        private ToolStripMenuItem filterToolStripMenuItem;
+        private ToolStripMenuItem logViewFiltersToolStripMenuItem;
+        private ToolStripMenuItem showFiltersToolStripMenuItem;
+        private ToolStripMenuItem addSelectedToFilterToolStripMenuItem;
+        private ToolStripMenuItem threadListFiltersToolStripMenuItem;
+        private ToolStripMenuItem showFiltersToolStripMenuItem1;
+        private ToolStripMenuItem addSelectedToFilterToolStripMenuItem1;
+        private ToolStripMenuItem highLigthToolStripMenuItem;
     }
 }

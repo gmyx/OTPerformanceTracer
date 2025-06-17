@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
+using OT_Performance_Tracer.forms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 
 namespace OT_Performance_Tracer.classes
 {
@@ -12,6 +14,7 @@ namespace OT_Performance_Tracer.classes
         public const string rootKey = "Software\\OTPerfTrace";
         private const string recentsKey = "Recents";
         private const string filtersKey = "Filters";
+        private const string highlightsKey = "Highligths";
 
         public enum RecentTypes
         {
@@ -25,11 +28,24 @@ namespace OT_Performance_Tracer.classes
             ThreadFilter
         }
 
+        public struct Highlight
+        {
+            public string filterText;
+            public Color color;
+
+            public Highlight(string _filterText, Color _color)
+            {
+                filterText = _filterText;
+                color = _color;
+            }
+        }
+
         #region "Generic Load/Save"
+
         private static string[] loadSubKey(string subKey, string typeName)
         {
             //generic loader function
-            //read from HKCU/Software/OTPerfTrace 
+            //read from HKCU/Software/OTPerfTrace
             RegistryKey? lKey = Registry.CurrentUser!.OpenSubKey(Settings.rootKey, false);
 
             if (lKey == null) return [];
@@ -53,10 +69,32 @@ namespace OT_Performance_Tracer.classes
             return lOut;
         }
 
+        private static string[] loadSubKey(string subKey)
+        {
+            //generic loader function
+            //read from HKCU/Software/OTPerfTrace
+            RegistryKey? lKey = Registry.CurrentUser!.OpenSubKey(Settings.rootKey, false);
+
+            if (lKey == null) return [];
+
+            RegistryKey? lSubKey = lKey.OpenSubKey(subKey, false);
+
+            if (lSubKey == null) return [];
+
+            //both keys exists, so read it
+            string[] lOut = [];
+            lSubKey.GetValueNames().ToList().ForEach(name =>
+            {
+                lOut = [.. lOut, lSubKey.GetValue(name)!.ToString()!];
+            });
+
+            return lOut;
+        }
+
         public static void saveSubKey(string subKey, string typeName, string[] data)
         {
             //read from HKCU/Software/OTPerfTrace/Filters
-            RegistryKey? lKey = Registry.CurrentUser!.CreateSubKey(Settings.rootKey, true);            
+            RegistryKey? lKey = Registry.CurrentUser!.CreateSubKey(Settings.rootKey, true);
 
             RegistryKey? lSubKey = lKey.CreateSubKey(subKey, true);
 
@@ -68,11 +106,26 @@ namespace OT_Performance_Tracer.classes
             {
                 lFilterKey.SetValue(i.ToString(), data[i]);
             }
-    ;
         }
-        #endregion
+
+        public static void saveSubKey(string subKey, string[] data)
+        {
+            //read from HKCU/Software/OTPerfTrace/Filters
+            RegistryKey? lKey = Registry.CurrentUser!.CreateSubKey(Settings.rootKey, true);
+
+            lKey.DeleteSubKeyTree(subKey, false); //purge old values
+            RegistryKey? lSubKey = lKey.CreateSubKey(subKey, true);
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                lSubKey.SetValue(i.ToString(), data[i]);
+            }
+        }
+
+        #endregion "Generic Load/Save"
 
         #region "Recents Load/Save"
+
         public static string[] LoadRecents(RecentTypes recent)
         {
             //load from registy a list of recent items
@@ -83,12 +136,14 @@ namespace OT_Performance_Tracer.classes
         {
             saveSubKey(recentsKey, recent.ToString(), recents);
         }
-        #endregion
+
+        #endregion "Recents Load/Save"
 
         #region "Filters Load/Save"
+
         public static string[] LoadFilters(FilterTypes filter)
         {
-           return loadSubKey(filtersKey, filter.ToString());
+            return loadSubKey(filtersKey, filter.ToString());
         }
 
         public static void SaveFilters(string[] filters, FilterTypes filter)
@@ -107,6 +162,39 @@ namespace OT_Performance_Tracer.classes
             //save
             SaveFilters(filters, filter);
         }
-        #endregion
+
+        #endregion "Filters Load/Save"
+
+        #region "Highligths Load/Save"
+
+        public static Highlight[] LoadHighLights()
+        {
+            string[] data = loadSubKey(highlightsKey);
+
+            //now convert this string data into output data
+            Highlight[] output = [];
+            foreach (string item in data) //probably a better way to do this
+            {
+                output = [.. output, Newtonsoft.Json.JsonConvert.DeserializeObject<Highlight>(item)];
+            }
+
+            return output;
+        }
+
+        public static void SaveHighlights(Highlight[] data)
+        {
+            //convert input into simple array of string
+            string[] simpleData = [];
+
+            foreach (Highlight item in data) //probably a better way to do this
+            {
+                simpleData = [.. simpleData, Newtonsoft.Json.JsonConvert.SerializeObject(item)];
+            }
+
+            //now ssave to registry
+            saveSubKey(highlightsKey, simpleData);
+        }
+
+        #endregion "Highligths Load/Save"
     }
 }

@@ -542,5 +542,12 @@ namespace OT_Performance_Tracer
         {
             SelectSearchFromScope(currentSearchIndex, SearchForm.SelectedScope); //from previous search
         }
+
+        private void highLigthToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //show the highlights form
+            fHighlight form = new();
+            form.ShowHighlights();
+        }
     }
 }
