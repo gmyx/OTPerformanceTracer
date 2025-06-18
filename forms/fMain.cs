@@ -229,6 +229,7 @@ namespace OT_Performance_Tracer
             ListViewItem[] items = [];
             DateTime diffFromPrevious = singleBlock.Parts![0].timeStamp;
             string[] filters = Settings.LoadFilters(Settings.FilterTypes.Logfilter); //preload filters
+            Settings.Highlight[] highlights = Settings.LoadHighLights();
             foreach ((DateTime timeStamp, string level, string message) part in singleBlock.Parts!)
             {
                 //see if excluded
@@ -241,6 +242,18 @@ namespace OT_Performance_Tracer
                 //mark red if more than 10 seconds have passed
                 if ((part.timeStamp - diffFromPrevious).TotalSeconds > 10) singleLine.ForeColor = Color.Red;
                 diffFromPrevious = part.timeStamp;
+
+                //mark if message is found in a hightlight
+                foreach (Settings.Highlight highlight in highlights) //it's a first found, first apply
+                {
+                    if (part.message.Contains(highlight.filterText, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        singleLine.BackColor = highlight.color;
+                        break;
+                    }
+                }
+
+                //add completed items
                 items = [.. items, singleLine];
             }
 
