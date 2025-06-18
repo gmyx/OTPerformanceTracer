@@ -179,7 +179,7 @@ namespace OT_Performance_Tracer
                     //append action, to get a bit more details, use ::
                     displayFunc = $"{displayFunc}::{block.Value.Action}";
                 }
-                singlePart.Text = $"{ThreadBlocks.BlockNames[block.Value.BlockType]} [{diff}] [{displayFunc}]";
+                singlePart.Text = $"{ThreadBlocks.BlockNames[block.Value.BlockType]} [{diff}] [{displayFunc}] [{startTime}]";
                 singlePart.Name = $"{FileName}_{block.Key}";
                 //set text color red if more than 10 seconds, unless startup, since that is very long
                 if (diff.TotalSeconds > 10 && block.Value.BlockType != ThreadBlocks.BlockTypes.Startup)
