@@ -58,6 +58,7 @@
             cCancel.TabIndex = 2;
             cCancel.Text = "&Cancel";
             cCancel.UseVisualStyleBackColor = true;
+            cCancel.Click += cCancel_Click;
             // 
             // fAddEditFilter
             // 

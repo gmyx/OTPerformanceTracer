@@ -25,5 +25,10 @@
             buttonPressed = DialogResult.OK;
             this.Close();
         }
+
+        private void cCancel_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

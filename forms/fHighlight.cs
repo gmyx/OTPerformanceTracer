@@ -73,6 +73,19 @@ namespace OT_Performance_Tracer.forms
 
         #endregion "List View Custom Draw"
 
+        private void AddItem(string filterText, Color color)
+        {
+            ListViewItem item = new();
+            ListViewItem.ListViewSubItem subItem = new();
+
+            item.Text = filterText;
+            subItem.BackColor = color;
+            item.SubItems.Add(subItem);
+
+            //add to list view
+            lstItems.Items.Add(item);
+        }
+
         public void ShowHighlights()
         {
             Highlight[] data = Settings.LoadHighLights();
@@ -80,15 +93,7 @@ namespace OT_Performance_Tracer.forms
             //update list
             foreach (Highlight highlight in data)
             {
-                ListViewItem item = new();
-                ListViewItem.ListViewSubItem subItem = new();
-
-                item.Text = highlight.filterText;
-                subItem.BackColor = highlight.color;
-                item.SubItems.Add(subItem);
-
-                //add to list view
-                lstItems.Items.Add(item);
+                AddItem(highlight.filterText, highlight.color);
             }
 
             this.ShowDialog();
@@ -106,6 +111,38 @@ namespace OT_Performance_Tracer.forms
             Settings.SaveHighlights(data);
 
             this.Close();
+        }
+
+        private void cAdd_Click(object sender, EventArgs e)
+        {
+            fAddEditHighlight form = new();
+
+            if (form.Add(null) == DialogResult.Cancel) return;
+
+            //add the filter to the list
+            AddItem(form.FilterValue, form.HighlighColor);
+        }
+
+        private void cEdit_Click(object sender, EventArgs e)
+        {
+            if (lstItems.SelectedItems.Count == 0) return;
+
+            fAddEditHighlight form = new();
+
+            if (form.Add(lstItems.SelectedItems[0].SubItems[1].BackColor, lstItems.SelectedItems[0].Text) == DialogResult.Cancel) return;
+
+            //update the filter to the list
+            lstItems.SelectedItems[0].Text = form.FilterValue;
+            lstItems.SelectedItems[0].SubItems[1].BackColor = form.HighlighColor;
+        }
+
+        private void cDelete_Click(object sender, EventArgs e)
+        {
+            if (lstItems.SelectedItems.Count == 0) return;
+
+            if (MessageBox.Show("Delete selected item?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.No) return;
+
+            lstItems.SelectedItems[0].Remove();
         }
     }
 }

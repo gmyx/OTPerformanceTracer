@@ -65,6 +65,7 @@
             cEdit.TabIndex = 2;
             cEdit.Text = "&Edit";
             cEdit.UseVisualStyleBackColor = true;
+            cEdit.Click += cEdit_Click;
             // 
             // cAdd
             // 
@@ -74,6 +75,7 @@
             cAdd.TabIndex = 1;
             cAdd.Text = "&Add";
             cAdd.UseVisualStyleBackColor = true;
+            cAdd.Click += cAdd_Click;
             // 
             // lstItems
             // 
@@ -108,6 +110,7 @@
             cDelete.TabIndex = 3;
             cDelete.Text = "&Delete";
             cDelete.UseVisualStyleBackColor = true;
+            cDelete.Click += cDelete_Click;
             // 
             // fHighlight
             // 
