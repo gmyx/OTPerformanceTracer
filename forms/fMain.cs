@@ -374,8 +374,10 @@ namespace OT_Performance_Tracer
             ThreadBlocks? singleBlock;
             if (Blocks.TryGetValue(blockName, out singleBlock) == false) return; //something went wrong
 
-            fShowDetails form = new();
-            form.ShowDetails(singleBlock.stats!);
+            fStats form = new();
+            form.ShowStats(singleBlock.stats!);
+            //fShowDetails form = new();
+            //form.ShowDetails(singleBlock.stats!);
         }
 
         private void lstLines_DoubleClick(object sender, EventArgs e)

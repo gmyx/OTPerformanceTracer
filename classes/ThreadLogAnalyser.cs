@@ -80,7 +80,6 @@ namespace OT_Performance_Tracer.classes
             }
 
             return (dOut, level, message);
-            
         }
 
         private string filterQuotes(string message)
@@ -89,7 +88,6 @@ namespace OT_Performance_Tracer.classes
             if (message.StartsWith('\'') == false) return message;
             if (message.EndsWith('\'') == false) return message;
             return message[1..][..^1];
-
         }
 
         public void AnalyseFile()
@@ -121,20 +119,20 @@ namespace OT_Performance_Tracer.classes
                         //ThreadBlocks oldBlock = currentBlock!;
                         currentBlock = new ThreadBlocks(StartID.Key);
 
-                        //if block is a request block, one line from previous block belongs here, sometimes                    
+                        //if block is a request block, one line from previous block belongs here, sometimes
                         if ((StartID.Key == BlockTypes.Request || StartID.Key == BlockTypes.LogLevelChange) && foundDebug == true)
                         {
-                            //depends on the previous line                            
+                            //depends on the previous line
                             (DateTime timeStamp, string level, string message) lastLine = _blocks[blockCount - 1].Parts!.Last();
                             _blocks[blockCount - 1].Parts!.Remove(_blocks[blockCount - 1].Parts!.Last());
 
                             //avoid false positives
                             if (falsePositives.Any(item => lastLine.message.Contains(item)) == false)
-                            {                            
+                            {
                                 //add it current block
                                 currentBlock.Parts!.Add(lastLine);
                             } // else just drop it if debug
-                            else if (lastLine.level == "DEBUG") 
+                            else if (lastLine.level == "DEBUG")
                             {
                                 //add it current block
                                 //currentBlock.Parts!.Add(lastLine);
@@ -184,7 +182,7 @@ namespace OT_Performance_Tracer.classes
                     //alternative to func. may have objID, may have objAction
                     string[] lineParts = line.Split(new char[] { '=', '?', '&' });
 
-                    //now do each subpart seperatly 
+                    //now do each subpart seperatly
                     for (int indexer = 0; indexer < lineParts.Length; indexer++)
                     {
                         if (lineParts[indexer].Contains('%')) continue; //most licky nexturl, ignore
@@ -209,7 +207,7 @@ namespace OT_Performance_Tracer.classes
                 else if (line.Contains("A<1,0,'__ExecutionHandler'", StringComparison.InvariantCultureIgnoreCase))
                 {
                     //this is the stats block
-                    currentBlock!.stats = line;
+                    currentBlock!.stats = value.message;
                 }
 
                 //add this line
@@ -230,7 +228,7 @@ namespace OT_Performance_Tracer.classes
 
             //last line of file could be a late log, causing issue... delete it
             if (_blocks.Last().Value.Parts!.Last().message.Contains("FilePrefs::GetKFilePrefs - sharing loaded pref"))
-            {                
+            {
                 //unless
                 //this is the one we want to surpress
                 _blocks.Last().Value.Parts!.Remove(_blocks.Last().Value.Parts!.Last());
