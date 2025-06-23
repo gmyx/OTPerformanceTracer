@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text.RegularExpressions;
 using static OT_Performance_Tracer.classes.ThreadBlocks;
 
 namespace OT_Performance_Tracer.classes
@@ -208,6 +209,16 @@ namespace OT_Performance_Tracer.classes
                 {
                     //this is the stats block
                     currentBlock!.stats = value.message;
+
+                    //it also gies us the performer
+                    Regex pattern = new Regex(@"(?:'PrgCtxUserName')=(.*?)(?:,|$)", RegexOptions.Singleline);
+                    MatchCollection results = pattern.Matches(value.message);
+
+                    //we only want the first result
+                    if (results.Count > 0)
+                    {
+                        currentBlock!.Performer = results.First().Groups[1].Value;
+                    }
                 }
 
                 //add this line
