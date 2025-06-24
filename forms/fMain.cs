@@ -290,7 +290,7 @@ namespace OT_Performance_Tracer
                 sslRuntime.Text = diff.ToString();
 
                 //if there are stats, enable button
-                cStats.Enabled = (value.singleBlock.stats != null);
+                viewStatsToolStripMenuItem.Enabled = (value.singleBlock.stats != null);
 
                 //load the list
                 lstLines.SuspendLayout(); //many writes, so don't update with every add
@@ -358,26 +358,6 @@ namespace OT_Performance_Tracer
         {
             //shunt to common function
             openShowDetails();
-        }
-
-        private void btnStats_Click(object sender, EventArgs e)
-        {
-            if (tvBlocks.SelectedNode == null) return;
-
-            string blockName = tvBlocks.SelectedNode!.Name;
-
-            //see if file or block, if file abort
-            if (blockName.Contains("_") == false) return;
-
-            //get the block
-            int blockIndex = int.Parse(blockName.Split("_")[1]);
-            ThreadBlocks? singleBlock;
-            if (Blocks.TryGetValue(blockName, out singleBlock) == false) return; //something went wrong
-
-            fStats form = new();
-            form.ShowStats(singleBlock.stats!);
-            //fShowDetails form = new();
-            //form.ShowDetails(singleBlock.stats!);
         }
 
         private void lstLines_DoubleClick(object sender, EventArgs e)
@@ -563,6 +543,24 @@ namespace OT_Performance_Tracer
             //show the highlights form
             fHighlight form = new();
             form.ShowHighlights();
+        }
+
+        private void viewStatsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tvBlocks.SelectedNode == null) return;
+
+            string blockName = tvBlocks.SelectedNode!.Name;
+
+            //see if file or block, if file abort
+            if (blockName.Contains("_") == false) return;
+
+            //get the block
+            int blockIndex = int.Parse(blockName.Split("_")[1]);
+            ThreadBlocks? singleBlock;
+            if (Blocks.TryGetValue(blockName, out singleBlock) == false) return; //something went wrong
+
+            fStats form = new();
+            form.ShowStats(singleBlock.stats!);
         }
     }
 }
